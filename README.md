@@ -7,7 +7,7 @@ endpoints out-of-band. A lightweight agent on each endpoint reports
 independently of the BES client, so you can tell a genuinely broken client apart
 from one that is merely powered off, network-isolated, or just slow to check in.
 
-![Dashboard](docs/screenshots/01-dashboard-dark.png)
+![Dashboard](docs/screenshots/07-dashboard-dark.png)
 
 ---
 
@@ -73,19 +73,25 @@ no telemetry.
 
 ## Screenshots
 
+### Sign In
+![Sign In](docs/screenshots/00-login.png)
+
 ### Dashboard
-![Dashboard — dark theme](docs/screenshots/01-dashboard-dark.png)
+![Dashboard — light theme](docs/screenshots/01-dashboard.png)
 
 ### Endpoints
-![Endpoints](docs/screenshots/03-endpoints.png)
+![Registered Endpoints](docs/screenshots/02-registered-endpoints.png)
+
+### Recent Activity
+![Recent Activity](docs/screenshots/03-recent-activity.png)
 
 ### Endpoint Detail
 <p align="center">
   <img src="docs/screenshots/04-endpoint-detail.png" alt="Endpoint Detail" width="500">
 </p>
 
-### Alerts
-![Critical Alerts](docs/screenshots/08-alerts.png)
+### Priority Alerts
+![Priority Alerts](docs/screenshots/08-priority-alerts.png)
 
 ### Administration
 ![Admin Settings](docs/screenshots/05-admin-settings.png)
@@ -96,8 +102,8 @@ no telemetry.
 ### Performance
 ![Performance](docs/screenshots/06a-performance.png)
 
-### Light Theme
-![Dashboard — light theme](docs/screenshots/07-dashboard-light.png)
+### Dark Theme
+![Dashboard — dark theme](docs/screenshots/07-dashboard-dark.png)
 
 ---
 
