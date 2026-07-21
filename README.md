@@ -132,6 +132,10 @@ reporting and human web access never share a surface.
 Security-sensitive modules are compiled to native shared libraries (Cython), and
 a SHA-256 manifest verifies the integrity of the distributed files at startup.
 
+The [communication and key-flow diagram](docs/AgentMonitor-Comms-and-Key-Flow.pdf)
+walks through the full enrollment, trust, and reporting sequence between BigFix,
+the agent, and the dashboard.
+
 ---
 
 ## Security
