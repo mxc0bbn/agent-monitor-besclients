@@ -1,3 +1,0 @@
-Screenshots are added before the first push. Filenames referenced by README.md:
-01-dashboard-dark.png  03-endpoints.png  04-endpoint-detail.png  05-admin-settings.png
-06-audit-log.png  06a-performance.png  07-dashboard-light.png  08-alerts.png
