@@ -15,7 +15,7 @@ from one that is merely powered off, network-isolated, or just slow to check in.
 
 In BigFix, much of the intelligence lives on the client. When the BES client
 breaks, none of the native BigFix interfaces (Console, Web Reports, WebUI) can
-distinguish "broken" from "powered off," "isolated," or "hasn't reported yet" —
+distinguish "broken" from "powered off," "isolated," or "hasn't reported yet";
 a missing report is silent by design.
 
 **Agent Monitor** closes that gap with a dedicated out-of-band channel. A small
@@ -23,10 +23,10 @@ agent runs on each endpoint, independent of the BES client, and reports to a
 self-hosted appliance. The dashboard surfaces three things the BigFix interfaces
 cannot:
 
-- **Unhealthy** — the agent's own local checks say the client is broken.
-- **Silent** — the agent has stopped reporting, so the endpoint may be down or
+- **Unhealthy**: the agent's own local checks say the client is broken.
+- **Silent**: the agent has stopped reporting, so the endpoint may be down or
   cut off.
-- **Disagreement** — BigFix believes the client is fine, but the agent says
+- **Disagreement**: BigFix believes the client is fine, but the agent says
   otherwise (or vice versa).
 
 It runs alongside your BigFix infrastructure as a self-hosted appliance on a
@@ -37,35 +37,35 @@ no telemetry.
 
 ## Key Features
 
-- **Out-of-Band Health Reporting** — An agent on each endpoint reports
+- **Out-of-Band Health Reporting**: An agent on each endpoint reports
   independently of the BES client, so client failures are detected even when
   BigFix itself goes quiet.
-- **Heartbeat and Diagnostics** — Every agent run sends a small heartbeat; a
+- **Heartbeat and Diagnostics**: Every agent run sends a small heartbeat; a
   richer diagnostic bundle is sent only when the endpoint is unhealthy. A missing
   heartbeat is itself a signal.
-- **Unhealthy / Silent / Disagreement Views** — The three states the native
+- **Unhealthy / Silent / Disagreement Views**: The three states the native
   BigFix interfaces cannot distinguish, made first-class on the dashboard.
-- **Alerting** — Email alerts when a critical endpoint turns unhealthy, with
+- **Alerting**: Email alerts when a critical endpoint turns unhealthy, with
   per-group recipients and per-recipient bundling to avoid alert storms.
-- **Endpoint Groups and Criticality** — Group endpoints, set criticality, and
+- **Endpoint Groups and Criticality**: Group endpoints, set criticality, and
   tune self-check intervals and alert routing per group.
-- **Cross-Platform Health Agent** — Windows and Linux agents, deployable through
+- **Cross-Platform Health Agent**: Windows and Linux agents, deployable through
   the BigFix Console.
-- **DMZ Forwarder** — Relay agent traffic from isolated network segments to the
+- **DMZ Forwarder**: Relay agent traffic from isolated network segments to the
   dashboard over a dedicated machine-plane port.
-- **Charter-Based Enrollment** — Endpoints enroll against a signed charter with
+- **Charter-Based Enrollment**: Endpoints enroll against a signed charter with
   per-endpoint keys; enrollment fails closed if the charter cannot be verified.
-- **Post-Quantum Signing** — FIPS 204 ML-DSA signatures for build attestation and
+- **Post-Quantum Signing**: FIPS 204 ML-DSA signatures for build attestation and
   agent reports.
-- **Role-Based Access with Tenant Scoping** — Multiple roles, with non-admin
+- **Role-Based Access with Tenant Scoping**: Multiple roles, with non-admin
   users scoped to their tenant on a deny-by-default basis.
-- **Security Hardening** — Password policies, account lockout, encrypted
+- **Security Hardening**: Password policies, account lockout, encrypted
   credential storage, TLS by default, and a startup integrity manifest over the
   distributed files.
-- **Audit Log** — Full audit trail of administrative actions with CSV and PDF
+- **Audit Log**: Full audit trail of administrative actions with CSV and PDF
   export.
-- **Backup and Restore** — Database backup and restore from the web interface.
-- **Performance and Health Monitoring** — Built-in performance page and a system
+- **Backup and Restore**: Database backup and restore from the web interface.
+- **Performance and Health Monitoring**: Built-in performance page and a system
   health view covering database, disk, and memory.
 - **Dark and Light Themes.**
 
@@ -77,7 +77,7 @@ no telemetry.
 ![Sign In](docs/screenshots/00-login.png)
 
 ### Dashboard
-![Dashboard — light theme](docs/screenshots/01-dashboard.png)
+![Dashboard (light theme)](docs/screenshots/01-dashboard.png)
 
 ### Endpoints
 ![Registered Endpoints](docs/screenshots/02-registered-endpoints.png)
@@ -103,7 +103,7 @@ no telemetry.
 ![Performance](docs/screenshots/06a-performance.png)
 
 ### Dark Theme
-![Dashboard — dark theme](docs/screenshots/07-dashboard-dark.png)
+![Dashboard (dark theme)](docs/screenshots/07-dashboard-dark.png)
 
 ---
 
@@ -111,9 +111,9 @@ no telemetry.
 
 Agent Monitor has two components:
 
-1. **Dashboard appliance** — a self-hosted web application on a single Ubuntu
+1. **Dashboard appliance**: a self-hosted web application on a single Ubuntu
    server (Nginx + Uvicorn + PostgreSQL, managed by systemd).
-2. **Health Agent** — a compiled cross-platform agent that runs on each endpoint
+2. **Health Agent**: a compiled cross-platform agent that runs on each endpoint
    (Windows Scheduled Task, Linux systemd timer), reporting on its own cadence.
 
 The operator web interface is served over HTTPS on 443. Agent and forwarder
