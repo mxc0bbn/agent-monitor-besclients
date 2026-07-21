@@ -1,0 +1,42 @@
+Agent Monitor for BES Clients
+
+TERMS OF USE
+
+Permission is hereby granted, free of charge, to any person or organization
+obtaining a copy of this software and associated files (the "Software"), to
+use and distribute the Software, subject to the following conditions:
+
+1. FREE USE: The Software may be installed, used, and operated by any person
+   or organization without charge, on any number of servers, without
+   restriction on the number of users, endpoints, or duration of use.
+
+2. FREE DISTRIBUTION: The Software may be freely distributed in its original,
+   unmodified form. Copies must include this license file.
+
+3. NO MODIFICATION FOR COMMERCIAL PURPOSES: The Software may not be modified,
+   reverse-engineered, decompiled, disassembled, or altered in any way for
+   the purpose of creating a derivative work for commercial sale or
+   distribution. This includes but is not limited to:
+   - Changing the application's branding, name, or visual identity
+   - Modifying the application's core functionality
+   - Removing or circumventing integrity protections
+   - Extracting source code from compiled components
+   - Incorporating any part of the Software into a commercial product
+
+4. NO WARRANTY: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+   KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+5. LIMITATION OF LIABILITY: IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+   HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+   AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+   CONNECTION WITH THE SOFTWARE OR THE USE OR PERFORMANCE OF THE SOFTWARE.
+
+6. CONFIGURATION: Users may configure the Software through its provided
+   settings interface, including but not limited to: server connections,
+   user accounts, endpoint groups, self-check schedules, alert recipients,
+   email settings, and TLS certificates. Such configuration does not
+   constitute modification under these terms.
+
+For questions, updates, or to report issues:
+https://github.com/mxc0bbn/agent-monitor-besclients

@@ -1,0 +1,101 @@
+name: Bug Report
+description: Report something that isn't working correctly in Agent Monitor
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out the fields below so we can reproduce and fix the issue as quickly as possible.
+
+        **Security issues**: Please do NOT report security vulnerabilities here. Use a private channel instead (contact the maintainer directly).
+
+  - type: input
+    id: dashboard-version
+    attributes:
+      label: Dashboard Version
+      description: Found under Administration → System Settings → About
+      placeholder: "2.6.7"
+    validations:
+      required: true
+
+  - type: input
+    id: agent-version
+    attributes:
+      label: Agent Version (if agent-related)
+      description: Shown on the endpoint detail view, or in the agent log
+      placeholder: "2.6.7.3"
+
+  - type: input
+    id: os
+    attributes:
+      label: Server OS / Version
+      description: The OS where the Agent Monitor dashboard is installed
+      placeholder: "Ubuntu Server 24.04 LTS"
+    validations:
+      required: true
+
+  - type: input
+    id: endpoint-os
+    attributes:
+      label: Endpoint OS / Version (if agent-related)
+      description: The OS of the endpoint whose agent is affected
+      placeholder: "Windows 11 23H2, Ubuntu 22.04"
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser (if UI-related)
+      description: Name and version of the browser where the issue occurred
+      placeholder: "Firefox 124, Chrome 123, Edge 123"
+
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Theme (if UI-related)
+      options:
+        - Not applicable
+        - Dark (default)
+        - Light
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the problem
+      placeholder: "When I click X, the page does Y instead of Z..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps someone else could follow to reproduce the issue
+      placeholder: |
+        1. Log in as an administrator
+        2. Go to Endpoints
+        3. Select several endpoints and choose an Actions option
+        4. Observe error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Paste any relevant log lines from the dashboard, the agent, or the browser console. These will be automatically formatted as code.
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Screenshots, network conditions, BigFix version, whether a forwarder is in the path, anything else that might help.

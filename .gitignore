@@ -1,0 +1,21 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# Local build / temp
+*.tmp
+*.log
+*.bak
+*.bak-*
+
+# Secrets / keys / certs — never commit (belt-and-suspenders; no source lives here)
+.env
+.env.*
+*.key
+*.pem
+*.pfx
+*.crt
