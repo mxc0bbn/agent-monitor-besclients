@@ -1,7 +1,5 @@
 # Agent Monitor for BES Clients
 
-![Total downloads](https://img.shields.io/github/downloads/mxc0bbn/agent-monitor-besclients/total)
-
 A self-hosted web application that monitors the health of BigFix (BES) client
 endpoints out-of-band. A lightweight agent on each endpoint reports
 independently of the BES client, so you can tell a genuinely broken client apart
@@ -20,14 +18,12 @@ a missing report is silent by design.
 
 **Agent Monitor** closes that gap with a dedicated out-of-band channel. A small
 agent runs on each endpoint, independent of the BES client, and reports to a
-self-hosted appliance. The dashboard surfaces three things the BigFix interfaces
+self-hosted appliance. The dashboard surfaces two things the BigFix interfaces
 cannot:
 
 - **Unhealthy**: the agent's own local checks say the client is broken.
 - **Silent**: the agent has stopped reporting, so the endpoint may be down or
   cut off.
-- **Disagreement**: BigFix believes the client is fine, but the agent says
-  otherwise (or vice versa).
 
 It runs alongside your BigFix infrastructure as a self-hosted appliance on a
 single Ubuntu server. There are no external dependencies, no cloud services, and
@@ -43,8 +39,8 @@ no telemetry.
 - **Heartbeat and Diagnostics**: Every agent run sends a small heartbeat; a
   richer diagnostic bundle is sent only when the endpoint is unhealthy. A missing
   heartbeat is itself a signal.
-- **Unhealthy / Silent / Disagreement Views**: The three states the native
-  BigFix interfaces cannot distinguish, made first-class on the dashboard.
+- **Unhealthy and Silent Views**: The endpoint states the native BigFix
+  interfaces cannot distinguish, made first-class on the dashboard.
 - **Alerting**: Email alerts when a critical endpoint turns unhealthy, with
   per-group recipients and per-recipient bundling to avoid alert storms.
 - **Endpoint Groups and Criticality**: Group endpoints, set criticality, and
@@ -109,12 +105,15 @@ no telemetry.
 
 ## Architecture
 
-Agent Monitor has two components:
+Agent Monitor has three components:
 
 1. **Dashboard appliance**: a self-hosted web application on a single Ubuntu
    server (Nginx + Uvicorn + PostgreSQL, managed by systemd).
 2. **Health Agent**: a compiled cross-platform agent that runs on each endpoint
    (Windows Scheduled Task, Linux systemd timer), reporting on its own cadence.
+3. **DMZ Forwarder** (optional): a relay that forwards agent reports from
+   isolated network segments (for example, a DMZ) to the dashboard over the
+   machine-plane port.
 
 The operator web interface is served over HTTPS on 443. Agent and forwarder
 traffic use a separate, dedicated machine-plane port (tcp/31313), so endpoint
@@ -172,8 +171,8 @@ repository for browsing without downloading a release.
 | Browsers | Chrome, Edge, Firefox |
 
 A BigFix **Master Operator** account is used for the optional cross-reference of
-BigFix's own last-report time against the agent's verdict (the Disagreement
-view). See the Installation Guide for setup details.
+BigFix's own last-report time against the agent's verdict. See the Installation
+Guide for setup details.
 
 ---
 
