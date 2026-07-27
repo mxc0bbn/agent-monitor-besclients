@@ -32,7 +32,6 @@ third-party front-end framework.
 | reportlab | PDF export | BSD-3-Clause |
 | python-dateutil | Date/time utilities | Apache-2.0 AND BSD-3-Clause |
 | pytz | Timezone database | MIT |
-| Cython | Compiles security-sensitive modules to native libraries at install time | Apache-2.0 |
 
 ## Platform components (installed by the installer, not bundled)
 
