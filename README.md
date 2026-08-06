@@ -159,6 +159,10 @@ Windows and Linux are published alongside it.
 The Installation Guide (PDF) is also maintained in [`docs/`](docs/) in this
 repository for browsing without downloading a release.
 
+See [CHANGELOG.md](CHANGELOG.md) for a release history summary and
+[ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) for the contributors who have helped
+shape the project.
+
 ---
 
 ## Compatibility
