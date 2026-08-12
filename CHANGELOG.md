@@ -6,6 +6,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/).
 For full release notes (upgrade instructions, assets, checksums) see the
 [Releases page](https://github.com/mxc0bbn/agent-monitor-besclients/releases).
 
+## [v2.7.2.2] - 2026-08-12
+
+### Fixed
+- **Windows agents now trust a private-certificate dashboard or forwarder on
+  their own, with no manual certificate step.** When a Windows endpoint installs
+  against a dashboard or forwarder that uses its own certificate authority, the
+  installer captures the complete certificate chain during setup, so certificate
+  verification turns on by itself and the agent reports over a verified
+  connection. Previously only part of the certificate was captured on Windows,
+  so verification could not be enabled without delivering a certificate by hand.
+  Windows only; the Linux agent, dashboard, and forwarder are unchanged from the
+  previous release.
+
 ## [v2.7.2.1] - 2026-08-10
 
 ### Fixed
