@@ -6,6 +6,54 @@ The format follows [Keep a Changelog](https://keepachangelog.com/).
 For full release notes (upgrade instructions, assets, checksums) see the
 [Releases page](https://github.com/mxc0bbn/agent-monitor-besclients/releases).
 
+## [v2.7.2.1] - 2026-08-10
+
+### Fixed
+- **Health Agent upgrades no longer risk losing the dashboard trust settings.**
+  On dashboards that use a private certificate authority, an earlier build could
+  stop reporting (show as Silent) after an upgrade. The agent now preserves its
+  established trust across upgrades and never writes an unusable trust setting.
+
+## [v2.7.2] - 2026-08-05
+
+### Changed
+- **The agent finds BigFix wherever it is installed.** If the BES Client, Root
+  Server, or Relay is on a non-default drive or folder, the agent still locates
+  it, so enrollment and Root Server / Relay detection work on any install layout.
+  Previously it looked only in the default locations.
+- **Connect by name or IP, with full certificate verification and no manual
+  certificate steps.** The dashboard's certificate now covers every way an agent
+  might address it (the reporting name you choose, the host name, localhost, and
+  the IP), so verification passes whether an agent points at a name or an IP.
+  Because the certificate is issued by the dashboard's own certificate authority,
+  changing or adding a reporting name can be reissued without touching every agent.
+- **Path settings accept quotes.** A folder path in the configuration works with
+  or without surrounding quotation marks.
+
+### Security
+- The dashboard's certificate authority key is stored so only the administrator
+  account can read it, and it is constrained to vouch only for that one dashboard.
+
+## [v2.7.1] - 2026-07-30
+
+### Changed
+- Maintenance and environment-wide rollout release. No functional changes to the
+  Health Agent.
+
+## [v2.7.0] - 2026-07-27
+
+### Changed
+- **TLS verification is now on by default.** The Health Agent authenticates the
+  dashboard's certificate before sending anything, and holds its reports rather
+  than send to an unverified peer.
+
+### Security
+- Additional hardening: credentials are never sent across a redirect to another
+  host; trust and routing changes are accepted only directly from the dashboard,
+  never through a relay; server-pushed timing is capped so the agent cannot be
+  told to effectively stop reporting; and key rotations require a signed
+  confirmation before taking effect.
+
 ## [v2.6.7] - 2026-07-21
 
 Initial public release.
