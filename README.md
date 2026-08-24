@@ -156,8 +156,14 @@ The latest release is available on the
 Each release provides the dashboard installer tarball; agent installers for
 Windows and Linux are published alongside it.
 
-The Installation Guide (PDF) is also maintained in [`docs/`](docs/) in this
-repository for browsing without downloading a release.
+**New to Agent Monitor? Start with the
+[Quick Start Guide](docs/AgentMonitor-QuickStart-Guide.pdf).** It is a single
+page that takes you from the downloaded files to a monitored environment in
+eight steps. You do not need to read the full Installation Guide to get going.
+
+The full [Installation Guide](docs/AgentMonitor-Installation-Guide.pdf) (PDF) is
+also maintained in [`docs/`](docs/) in this repository for browsing without
+downloading a release.
 
 See [CHANGELOG.md](CHANGELOG.md) for a release history summary and
 [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) for the contributors who have helped
