@@ -6,6 +6,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/).
 For full release notes (upgrade instructions, assets, checksums) see the
 [Releases page](https://github.com/mxc0bbn/agent-monitor-besclients/releases).
 
+## [v2.8.0] - 2026-08-24
+
+### Added
+- **Sign the Windows Health Agent with a code-signing certificate your
+  organization owns.** The dashboard can generate a signing certificate for you,
+  or use one from your existing PKI, and sign the Windows agent so your endpoints
+  verify it against a certificate you control. Nothing outside your organization
+  holds a key your endpoints trust, and you can replace the certificate at any
+  time. The Linux agent is verified through build attestation and needs no
+  signing.
+- **Forwarder placement and off-network routing.** Each forwarder can be marked
+  Internal or DMZ. Agents prefer internal forwarders while on the corporate
+  network and DMZ forwarders when off it, and a per-group policy can prevent an
+  endpoint group from ever using an external forwarder.
+- **Maintenance windows.** Schedule planned work so expected reboots and outages
+  do not raise alerts, then resume normal alerting automatically when the window
+  ends.
+- **On-demand check-in.** Run the agent with the check-in command to make an
+  endpoint report to the dashboard right away instead of waiting for its next
+  scheduled run.
+
+### Changed
+- **Clearer, more consistent agent logs.** The Health Agent log format was
+  reworked for easier reading and troubleshooting.
+- **Housekeeping now covers more history.** Retention settings prune old ingest
+  failure records and audit log entries alongside the existing data.
+- **Dashboard refinements.** Attestation history is paged with click-to-copy and
+  multi-select delete, the IP rate-limit whitelist accepts network ranges, and
+  several labels and tooltips were clarified.
+
 ## [v2.7.2.2] - 2026-08-12
 
 ### Fixed
