@@ -161,8 +161,9 @@ Windows and Linux are published alongside it.
 page that takes you from the downloaded files to a monitored environment in
 eight steps. You do not need to read the full Installation Guide to get going.
 
-The full [Installation Guide](docs/AgentMonitor-Installation-Guide.pdf) (PDF) is
-also maintained in [`docs/`](docs/) in this repository for browsing without
+The full [Installation Guide](docs/AgentMonitor-Installation-Guide.pdf) and
+[Administrator Guide](docs/AgentMonitor-Administrator-Guide.pdf) (PDF) are also
+maintained in [`docs/`](docs/) in this repository for browsing without
 downloading a release.
 
 See [CHANGELOG.md](CHANGELOG.md) for a release history summary and
