@@ -5,6 +5,11 @@ endpoints out-of-band. A lightweight agent on each endpoint reports
 independently of the BES client, so you can tell a genuinely broken client apart
 from one that is merely powered off, network-isolated, or just slow to check in.
 
+> **Have questions before you download or try it?** The
+> **[Frequently Asked Questions](FAQ.md)** answer the most common questions about
+> what Agent Monitor is, how it works, and how it secures your data, so you can
+> evaluate it before installing anything.
+
 ![Dashboard](docs/screenshots/07-dashboard-dark.png)
 
 ---
@@ -160,6 +165,10 @@ Windows and Linux are published alongside it.
 [Quick Start Guide](docs/AgentMonitor-QuickStart-Guide.pdf).** It is a single
 page that takes you from the downloaded files to a monitored environment in
 eight steps. You do not need to read the full Installation Guide to get going.
+
+Not ready to install yet? The **[FAQ](FAQ.md)** answers common questions about
+setup, security, networking, and day-to-day operation up front, so you can decide
+whether Agent Monitor fits before downloading anything.
 
 The full [Installation Guide](docs/AgentMonitor-Installation-Guide.pdf) and
 [Administrator Guide](docs/AgentMonitor-Administrator-Guide.pdf) (PDF) are also
