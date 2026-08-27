@@ -119,7 +119,7 @@ With report encryption enabled, no. The report body is a sealed "strongbox" that
 The dashboard follows standard secure-development practices. User input is always handled so that classes of attack such as SQL injection cannot reach the database, the application runs on a memory-safe platform, and repeated login attempts are bounded by rate limiting and automatic account lockout. Passwords are never stored in readable form, and administrators can enforce a password policy for length, complexity, expiry, and reuse.
 
 ### Can a user see data outside their scope, gain privileges they were not given, or act as another user?
-No. Access is multi-tenant and deny-by-default: a user sees only the tenants granted to them, and that boundary is enforced on the server for every request, not in the browser. Roles are checked on the server for every action, and a session token cannot be altered to grant privileges the account does not actually have. Sensitive administrative actions are recorded in the audit log.
+No. Access is multi-tenant and deny-by-default. A user sees only the tenants granted to them, and that boundary is enforced on the server for every request, not in the browser. Roles are checked on the server for every action, and a session token cannot be altered to grant privileges the account does not actually have. Sensitive administrative actions are recorded in the audit log.
 
 ### Is there multi-factor authentication (MFA)?
 Not yet. Authenticator-app based MFA is on the roadmap. Today, access is protected by the password policy, account lockout, and rate limiting, and certain sensitive actions require you to re-enter your password before they proceed.
@@ -159,7 +159,7 @@ The dashboard identifies an endpoint by its cryptographic identity, not its host
 ## 6. Encryption and Report Confidentiality (Strongbox)
 
 ### What is a "Strongbox"?
-Strongbox is the report-encryption subsystem, the sealed box a report travels in. Each tenant has its own encryption keypair: the dashboard holds the private half, and agents hold only the public half. That means an agent can encrypt a report so that only the dashboard can open it, and nothing in between (the network or a forwarder) can read it. Strongbox is opt-in per tenant, with three modes (off, optional, required), and it ships off by default. When a tenant is set to optional or required, that tenant's reports are encrypted end to end; when it is off, reports are protected only by the transport (TLS).
+Strongbox is the report-encryption subsystem, the sealed box a report travels in. Each tenant has its own encryption keypair. The dashboard holds the private half, and agents hold only the public half. That means an agent can encrypt a report so that only the dashboard can open it, and nothing in between (the network or a forwarder) can read it. Strongbox is opt-in per tenant, with three modes (off, optional, required), and it ships off by default. When a tenant is set to optional or required, that tenant's reports are encrypted end to end; when it is off, reports are protected only by the transport (TLS).
 
 ### Which encryption and signing algorithms does Agent Monitor use?
 - **Signatures (authenticity):** every agent report is signed. New agents use ML-DSA-65, a post-quantum signature standard (NIST FIPS 204), designed to stay secure even against future quantum computers.
@@ -168,7 +168,7 @@ Strongbox is the report-encryption subsystem, the sealed box a report travels in
 Using a classical and a post-quantum method together protects against both today's threats and "collect now, decrypt later" threats.
 
 ### How do agents get the encryption key, and can it be changed?
-Each tenant's public encryption key is delivered to its agents over their normal authenticated channel, and it is signed so an agent can confirm the key is genuine before trusting it. At install the agent is given the dashboard's identity, so it can confirm each key was signed by that dashboard. Keys can be changed at any time: an administrator can rotate a tenant's key routinely, or immediately invalidate the keys as part of an incident response. Either way, agents pick up the new key automatically the next time they check in, with no work on the endpoints.
+Each tenant's public encryption key is delivered to its agents over their normal authenticated channel, and it is signed so an agent can confirm the key is genuine before trusting it. At install the agent is given the dashboard's identity, so it can confirm each key was signed by that dashboard. Keys can be changed at any time. An administrator can rotate a tenant's key routinely, or immediately invalidate the keys as part of an incident response. Either way, agents pick up the new key automatically the next time they check in, with no work on the endpoints.
 
 ---
 
@@ -177,7 +177,7 @@ Each tenant's public encryption key is delivered to its agents over their normal
 ### How does the dashboard know an agent build is legitimate?
 Every agent package carries a small signed statement naming the build's version, platform, and a fingerprint (a SHA-256 hash) of the exact binary. That statement is signed at release time with a private key that exists only on the developer's release systems and never ships in any product. The dashboard carries the matching public key built into its own code, and a public key can check a signature but can't create one, so it's safe to distribute.
 
-When an agent reports in, the dashboard checks two things: that the statement was really signed by the developer's key, and that the fingerprint in the statement matches the fingerprint the agent measured on its own binary. If they match, the build is recorded as known-good automatically. This works entirely offline; the dashboard never has to contact the developer to confirm.
+When an agent reports in, the dashboard checks two things. That the statement was really signed by the developer's key, and that the fingerprint in the statement matches the fingerprint the agent measured on its own binary. If they match, the build is recorded as known-good automatically. This works entirely offline; the dashboard never has to contact the developer to confirm.
 
 ### Can an attacker substitute a fake or tampered agent and have it accepted as genuine?
 No.
@@ -253,7 +253,7 @@ No. Email alerts fire only when a critical endpoint turns unhealthy. Silent and 
 Yes. Schedule a maintenance window for the endpoints, group, or tenant you're working on, and the dashboard suppresses their alerts for that period, then resumes normal alerting automatically when the window ends. Health changes are still recorded during the window; they just don't raise alerts, so planned reboots and patching don't set off a storm. Endpoints in a window show a Maintenance label.
 
 ### Why did an alert email show a tenant name I didn't set, and can I rename a tenant?
-There's no global "rename tenant." A tenant's stored name comes from its BigFix masthead. What you can set is a per-user alias: each dashboard account can label tenants its own way, and every screen shows your alias. Because alert emails go to specific recipients, an email uses the alias belonging to the account that owns that recipient's address; a recipient address with no matching account sees the stored name. So if one person has two accounts, set the alias on both to keep it consistent.
+There's no global "rename tenant." A tenant's stored name comes from its BigFix masthead. What you can set is a per-user alias. Each dashboard account can label tenants its own way, and every screen shows your alias. Because alert emails go to specific recipients, an email uses the alias belonging to the account that owns that recipient's address; a recipient address with no matching account sees the stored name. So if one person has two accounts, set the alias on both to keep it consistent.
 
 ---
 
