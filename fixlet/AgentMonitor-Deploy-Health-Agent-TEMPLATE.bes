@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+    <Fixlet>
+        <Title>TEMPLATE: Install or Upgrade the Agent Monitor Health Agent (edit before use)</Title>
+        <Description><![CDATA[
+<p><strong>This is a template Fixlet. You must edit the action script before it will run.</strong> Replace the <code>CHANGE_ME_...</code> placeholders with your download location and the file names you staged. They are called out at the top of the action script.</p>
+
+<p><strong>What it does:</strong> installs or upgrades the Agent Monitor Health Agent on Windows and Linux endpoints. It downloads the agent package and the dashboard's charter file from a location you host, extracts the package, drops the charter beside the installer, and runs the installer silently. The charter carries everything the agent needs.</p>
+
+<p><strong>Before you deploy:</strong></p>
+<ol>
+<li>Download the Agent Monitor release assets (the Windows package and the Linux package).</li>
+<li>In the dashboard, under Administration, then System Settings, then Agent Builds: generate a charter. If you want the Windows agent code-signed (recommended), also create a code-signing certificate authority, sign the Windows agent with it, and download the signing CA's public certificate.</li>
+<li>Place the files your endpoints will download in a location they can reach, for example the BigFix Root Server's <code>wwwrootbes</code> folder: the Windows package, the Linux package, the charter, and (if you signed the agent) the signing CA certificate.</li>
+<li>Edit the action script below: set the download URL and the file names. If you are not signing the Windows agent, delete the two lines in the code-signing CA block.</li>
+</ol>
+
+<p><strong>Optional Windows code-signing:</strong> If you sign the Windows agent with your own certificate, include the signing CA's public certificate and the installer will add it to the endpoint's trust store, but only after verifying the agent is genuinely signed by that certificate. This makes the signed agent trusted by Windows, which gives a clean integrity state and satisfies application-control tools such as AppLocker. Linux is verified by build attestation and is not code-signed, so this does not apply there.</p>
+
+<p><strong>What gets installed:</strong></p>
+<ul>
+<li>Windows: <code>C:\Program Files\AgentMonitor\</code>, plus the Scheduled Tasks <code>AgentMonitor</code> and <code>AgentMonitor-Watchdog</code>.</li>
+<li>Linux: <code>/opt/agentmonitor/</code>, plus the <code>agentmonitor.timer</code> systemd timer and the watchdog service.</li>
+</ul>
+
+<p><strong>Notes:</strong> This template assumes the official Agent Monitor package layout (the Windows package extracts to an <code>AgentMon-Agent</code> folder containing <code>AgentMon-Agent-Setup.exe</code>; the Linux package extracts to an <code>agentmonitor</code> folder containing <code>install.sh</code>). Renaming the downloaded files is fine; do not repackage their contents. The applicability check below targets version 2.8.0.0; adjust it if you deploy a different version.</p>
+        ]]></Description>
+        <Relevance>(windows of operating system) OR (linux of operating system)</Relevance>
+        <Relevance><![CDATA[if (windows of operating system) then (((not exists file ((native program files folder) as string & "\AgentMonitor\AgentMonitor.exe")) OR (version of file ((native program files folder) as string & "\AgentMonitor\AgentMonitor.exe") < "2.8.0.0" as version))) else (if linux of operating system then (((not exists file "/etc/agentmonitor/VERSION") OR ((line 1 of file "/etc/agentmonitor/VERSION" as trimmed string) as version < "2.8.0.0" as version))) else (False))]]></Relevance>
+        <Category>Software Distribution</Category>
+        <DownloadSize>0</DownloadSize>
+        <Source>Agent Monitor</Source>
+        <SourceID></SourceID>
+        <SourceReleaseDate>2026-08-26</SourceReleaseDate>
+        <SourceSeverity>Low</SourceSeverity>
+        <CVENames></CVENames>
+        <SANSID></SANSID>
+        <Domain>BESC</Domain>
+        <DefaultAction ID="Action1">
+            <Description>
+                <PreLink>Install or upgrade the Agent Monitor Health Agent. </PreLink>
+                <Link>Click here</Link>
+                <PostLink> to deploy. No parameters are needed; the charter supplies the dashboard URL, enrollment key, and trust anchor.</PostLink>
+            </Description>
+            <ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[// =========================================================================
+// Agent Monitor for BES Clients: Health Agent install / upgrade (TEMPLATE)
+// =========================================================================
+// EDIT BEFORE USE. Replace every CHANGE_ME_ placeholder below:
+//
+//   CHANGE_ME_DOWNLOAD_URL   the base URL your endpoints download from,
+//                            including scheme, host, port, and path.
+//                            Example: http://your-root-server:52311/your-path
+//   CHANGE_ME_WINDOWS_PKG    the Windows package file name (a .zip)
+//   CHANGE_ME_LINUX_PKG      the Linux package file name (a .tar.gz)
+//   CHANGE_ME_CHARTER        the charter file name (a .charter)
+//   CHANGE_ME_CA_CERT        the signing CA public certificate file name (a
+//                            .crt), only if you code-signed the Windows agent
+//
+// The charter, downloaded beside the installer, carries the dashboard URL,
+// the enrollment key, and the trust anchor, so no parameters are needed.
+
+if {windows of operating system}
+
+    delete agent.zip
+    delete dashboard.charter
+    delete agent-signing-ca.crt
+
+    download now as agent.zip CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_WINDOWS_PKG
+    download now as dashboard.charter CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_CHARTER
+
+    // Extract the package, then drop the charter beside the setup program so
+    // the installer picks it up automatically.
+    waithidden powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Remove-Item -Recurse -Force 'C:\temp\agentmonitor' -ErrorAction SilentlyContinue; Expand-Archive -Path '{pathname of file "agent.zip" of folder "__Download" of client folder of current site}' -DestinationPath 'C:\temp\agentmonitor' -Force; Copy-Item -Path '{pathname of file "dashboard.charter" of folder "__Download" of client folder of current site}' -Destination 'C:\temp\agentmonitor\AgentMon-Agent\dashboard.charter' -Force"
+
+    // --- CODE-SIGNING CA (optional, Windows only) ------------------------------
+    // If you signed the Windows agent with your own certificate, these two lines
+    // deliver the signing CA's public certificate beside the installer. The
+    // installer adds it to the trust store ONLY after verifying the agent is
+    // actually signed by this CA, so the signed agent becomes trusted (clean
+    // integrity, and it satisfies application-control tools such as AppLocker).
+    // If you run the agent UNSIGNED, DELETE the next two lines.
+    download now as agent-signing-ca.crt CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_CA_CERT
+    waithidden powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Copy-Item -Path '{pathname of file "agent-signing-ca.crt" of folder "__Download" of client folder of current site}' -Destination 'C:\temp\agentmonitor\AgentMon-Agent\agent-signing-ca.crt' -Force"
+    // ---------------------------------------------------------------------------
+
+    waithidden powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem -Path 'C:\temp\agentmonitor' -Recurse -File | Unblock-File"
+
+    // Run the installer silently. It installs the agent, imports the verified
+    // signing CA if present, and enrolls (fresh) or upgrades in place.
+    waithidden "C:\temp\agentmonitor\AgentMon-Agent\AgentMon-Agent-Setup.exe" --silent
+    continue if {exit code of action = 0}
+
+elseif {linux of operating system}
+
+    delete agent.tar.gz
+    delete dashboard.charter
+
+    download now as agent.tar.gz CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_LINUX_PKG
+    download now as dashboard.charter CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_CHARTER
+
+    // Extract the package, then drop the charter beside install.sh so the
+    // installer picks it up automatically.
+    wait /bin/sh -c "rm -rf /tmp/agentmonitor && /bin/tar -xzf '{pathname of file "agent.tar.gz" of folder "__Download" of client folder of current site}' -C /tmp"
+    wait /bin/sh -c "cp '{pathname of file "dashboard.charter" of folder "__Download" of client folder of current site}' /tmp/agentmonitor/dashboard.charter"
+    wait /bin/chmod +x /tmp/agentmonitor/install.sh
+
+    // Run the installer silently. A fresh machine installs; an existing agent is upgraded in place.
+    wait /tmp/agentmonitor/install.sh --silent
+    continue if {exit code of action = 0}
+
+endif
+]]></ActionScript>
+            <SuccessCriteria Option="RunToCompletion"></SuccessCriteria>
+        </DefaultAction>
+    </Fixlet>
+</BES>
