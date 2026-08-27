@@ -29,7 +29,7 @@ Three pieces, two of them required:
 - **The Forwarder (optional):** a relay for endpoints that cannot reach (or are not allowed to contact) the dashboard directly, such as machines in a restricted network or machines outside your network.
 
 ### How do I install the dashboard?
-Extract the tarball and run the installer on a clean Ubuntu server. Everything it needs is installed and configured by the installer (web server, application service, and PostgreSQL database). Internet access from the server is required at this step so the components can be downloaded.
+Extract the tarball and run the installer on a clean Ubuntu server. Everything it needs is installed and configured by the installer (web server, application service, and PostgreSQL database). Internet access from the server is required at this step so the components can be downloaded. For the full step-by-step walkthrough, see the [Installation Guide](docs/AgentMonitor-Installation-Guide.pdf).
 
 ### How does the Health Agent get onto endpoints? By Fixlet or manually?
 Both are supported. The installer gets its settings either through explicit command-line values or a charter file that you can place in the same folder as the installer. If neither is provided, it also has an interactive prompt.
