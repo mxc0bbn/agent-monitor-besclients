@@ -26,7 +26,7 @@ Three pieces, two of them required:
 
 - **The Dashboard:** a self-hosted web application on a single Ubuntu Server (24.04 or 26.04 LTS). This is where everything is managed.
 - **The Health Agent:** a lightweight agent that runs on each endpoint you want to monitor, Windows or Linux.
-- **The Forwarder (optional):** a relay for endpoints that cannot reach (or are not allowed to contact) the dashboard directly, such as machines in a restricted network or machines outside your network.
+- **The Forwarder (optional):** a relay for endpoints that can't reach (or are not allowed to contact) the dashboard directly, such as machines in a restricted network or machines outside your network.
 
 ### How do I install the dashboard?
 Extract the tarball and run the installer on a clean Ubuntu server. Everything it needs is installed and configured by the installer (web server, application service, and PostgreSQL database). Internet access from the server is required at this step so the components can be downloaded. For the full step-by-step walkthrough, see the [Installation Guide](docs/AgentMonitor-Installation-Guide.pdf).
@@ -57,13 +57,13 @@ It watches for three things:
 2. Is the BES Client still writing to its log recently? (checked against a freshness window, 2 hours by default)
 3. Is the client's core configuration file (`actionsite.afxm`) present?
 
-An endpoint is Unhealthy if the service is stopped, or there is no log at all, or the log has gone untouched for more than four times the freshness window (8 hours by default), or the core file is missing. It is Healthy when the client is running and the log is fresh. In the rare case where the agent cannot even locate the BigFix data directory, the status is Unknown.
+An endpoint is Unhealthy if the service is stopped, or there is no log at all, or the log has gone untouched for more than four times the freshness window (8 hours by default), or the core file is missing. It is Healthy when the client is running and the log is fresh. In the rare case where the agent can't even locate the BigFix data directory, the status is Unknown.
 
 ### How often does the agent check?
 There are three layers working together:
 
 1. The agent is launched by the operating system scheduler every 10 minutes on Linux and every 15 minutes on Windows.
-2. It runs a full self-check about every 10 minutes. If an endpoint is unhealthy, the next check is pulled in sooner so recovery is noticed quickly.
+2. When launched, it runs a full self-check. If an endpoint is unhealthy, the next check is pulled in sooner so recovery is noticed quickly.
 3. A watchdog catches a sudden BES Client failure in real time. On Linux this is event-driven and reacts in seconds. On Windows it polls the service, every 60 seconds by default (adjustable to 1, 2, 5, or 10 minutes in System Settings).
 
 ### If nothing is wrong, does the agent still report?
@@ -74,7 +74,7 @@ Every check-in, including a plain heartbeat, updates the endpoint's last-seen ti
 ### What does the agent send when it finds a problem?
 An event report identifying the machine and explaining the problem. It carries the essentials: hostname, OS and agent version, the status and the reasons for the status, and what the agent observed about the BES Client (running or not, version, when the log last changed, when it last reported, etc.).
 
-On the moment an endpoint first becomes unhealthy, the agent also attaches a one-time diagnostic bundle for troubleshooting. This includes a tail of the client log plus network state, clock offset, free disk space, select client settings, and recent log errors. This bundle is sent only on the transition into unhealthy, not on every report.
+The agent also attaches a one-time diagnostic bundle for troubleshooting. This includes a tail of the client log plus network state, clock offset, free disk space, select client settings, and recent log errors. This bundle is sent only on the transition into unhealthy, not on every report.
 
 ### Does the Health Agent take any action to fix a broken BES client, such as restarting it?
 No, and that's intentional.
@@ -86,7 +86,7 @@ The Health Agent is deliberately report-only. It watches and reports. It doesn't
 
 When the BES client stops or hangs, Agent Monitor's job is to make that visible right away (as Unhealthy or Silent) and alert you, so the failure doesn't stay hidden. Detection and remediation stay cleanly separated. Agent Monitor tells you what's wrong. You decide how to fix it.
 
-### How can you ensure that the report is not intercepted by a middleman that can read vital information about the endpoint?
+### How can you prevent the report from being read by a middleman?
 If report encryption is enabled for the tenant, the whole payload is encrypted before it leaves the machine. The diagnostic bundle is encrypted using a hybrid X25519 + ML-KEM-768 key encapsulation (a classical elliptic-curve key exchange paired with a post-quantum one), HKDF-SHA256 to derive the encryption key, and AES-256-GCM to encrypt the payload. Using a classical and a post-quantum method together means the protection holds even if either one is broken later, including by a future quantum computer.
 
 ### What is the difference between Unhealthy, Silent, and Disagreement?
@@ -105,10 +105,13 @@ An endpoint becomes Silent after 24 hours with no check-in. After 72 hours of be
 Yes, through a forwarder. The agent reports to a forwarder that does have a path to the dashboard. The forwarder passes the report along.
 
 ### How does the forwarder work?
-It is a store-and-forward "relay." It serves only the agent reporting paths and passes each request through untouched, adding only its own identifying header. If the dashboard is briefly unreachable, the forwarder holds the reports and replays them in order once the dashboard returns, answering the agent with an "accepted" in the meantime. It never decodes or reads the reports. It moves the exact bytes through in each direction.
+It is a store-and-forward "relay." It serves only the agent reporting paths and passes each request through untouched, adding only its own identifying header. If the dashboard is briefly unreachable, the forwarder holds the reports and sends them in order once the dashboard returns, answering the agent with an "accepted" in the meantime. It never decrypts or reads the reports. It moves the exact bytes through in each direction.
 
 ### Do agents always go through a forwarder, or only when they need to?
-Agents talk to the dashboard directly whenever they can. A forwarder is used when an endpoint cannot, or is not allowed to, reach the dashboard directly. Each forwarder is marked Internal or DMZ. If an administrator manually assigns agents to a forwarder, those agents will prefer an internal forwarder while on the corporate network and a DMZ forwarder when off it. A per-group policy can also prevent a group of endpoints from ever using an external forwarder.
+Agents talk to the dashboard directly whenever they can. A forwarder is used when an endpoint can't, or is not allowed to, reach the dashboard directly. Each forwarder is marked Internal or DMZ. If an administrator manually assigns agents to a forwarder, those agents will prefer an internal forwarder while on the corporate network and a DMZ forwarder when off it. A per-group policy can also prevent a group of endpoints from ever using an external forwarder.
+
+### Why is the forwarder Windows-only? Will there be a Linux forwarder in the future?
+The forwarder currently ships for Windows. This is a packaging choice, not a technical limitation. The forwarder is a lightweight, platform-neutral relay, and it ships for Windows first because it is typically deployed alongside a BigFix relay host, which is most often Windows. A Linux forwarder may follow in a later release. If you need one, open an issue and let us know.
 
 ### Is the agent to forwarder to dashboard path secure?
 Yes.
@@ -126,10 +129,10 @@ With report encryption enabled, no. The report body is a sealed "strongbox" that
 ## 4. Authentication and Access Control
 
 ### How is the login protected against common attacks?
-The dashboard follows standard secure-development practices. User input is always handled so that classes of attack such as SQL injection cannot reach the database, the application runs on a memory-safe platform, and repeated login attempts are bounded by rate limiting and automatic account lockout. Passwords are never stored in readable form, and administrators can enforce a password policy for length, complexity, expiry, and reuse.
+The dashboard follows standard secure-development practices. User input is always handled so that classes of attack such as SQL injection can't reach the database, the application runs on a memory-safe platform, and repeated login attempts are bounded by rate limiting and automatic account lockout. Passwords are never stored in readable form, and administrators can enforce a password policy for length, complexity, expiry, and reuse.
 
 ### Can a user see data outside their scope, gain privileges they were not given, or act as another user?
-No. Access is multi-tenant and deny-by-default. A user sees only the tenants granted to them, and that boundary is enforced on the server for every request, not in the browser. Roles are checked on the server for every action, and a session token cannot be altered to grant privileges the account does not actually have. Sensitive administrative actions are recorded in the audit log.
+No. Access is multi-tenant and deny-by-default. A user sees only the tenants granted to them, and that boundary is enforced on the server for every request, not in the browser. Roles are checked on the server for every action, and a session token can't be altered to grant privileges the account does not actually have. Sensitive administrative actions are recorded in the audit log.
 
 ### Is there multi-factor authentication (MFA)?
 Not yet. Authenticator-app based MFA is on the roadmap. Today, access is protected by the password policy, account lockout, and rate limiting, and certain sensitive actions require you to re-enter your password before they proceed.
@@ -150,7 +153,7 @@ It is a per-tenant setting that controls what happens when a new endpoint enroll
 Either way, which tenant an endpoint belongs to is decided automatically from the machine's BigFix gather URL.
 
 ### What stops a rogue device from faking a heartbeat or impersonating an endpoint?
-Every agent has its own private key, generated on that endpoint and never shared. It signs every message it sends, and the dashboard verifies each one against that endpoint's enrolled key, confirms the message is recent and not a replay, and confirms the endpoint is enrolled and not revoked. A rogue device does not hold the private key, so it cannot produce a valid signature, and unsigned requests are always rejected.
+Every agent has its own private key, generated on that endpoint and never shared. It signs every message it sends, and the dashboard verifies each one against that endpoint's enrolled key, confirms the message is recent and not a replay, and confirms the endpoint is enrolled and not revoked. A rogue device does not hold the private key, so it can't produce a valid signature, and unsigned requests are always rejected.
 
 ### If I revoke an agent, can it re-enroll itself, or must I reinstall?
 A revoked agent can't quietly re-enroll itself. That's the point of revocation. There are two recovery paths:
@@ -172,7 +175,7 @@ The dashboard identifies an endpoint by its cryptographic identity, not its host
 Strongbox is the report-encryption subsystem, the sealed box a report travels in. Each tenant has its own encryption keypair. The dashboard holds the private half, and agents hold only the public half. That means an agent can encrypt a report so that only the dashboard can open it, and nothing in between (the network or a forwarder) can read it. Strongbox is opt-in per tenant, with three modes (off, optional, required), and it ships off by default. When a tenant is set to optional or required, that tenant's reports are encrypted end to end. When it is off, reports are protected only by the transport (TLS).
 
 ### Which encryption and signing algorithms does Agent Monitor use?
-- **Signatures (authenticity):** every agent report is signed. New agents use ML-DSA-65, a post-quantum signature standard (NIST FIPS 204), designed to stay secure even against future quantum computers.
+- **Signatures (authenticity):** every agent report is signed. Agents use ML-DSA-65, a post-quantum signature standard (NIST FIPS 204), designed to stay secure even against future quantum computers.
 - **Encryption (confidentiality):** when Strongbox is enabled, reports are encrypted with a hybrid key exchange, X25519 combined with ML-KEM-768. The shared secret is run through HKDF-SHA256 to derive a key, which drives AES-256-GCM to encrypt the message.
 
 Using a classical and a post-quantum method together protects against both today's threats and "collect now, decrypt later" threats.
