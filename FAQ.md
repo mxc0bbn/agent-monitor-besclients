@@ -37,6 +37,9 @@ Both are supported. The installer gets its settings either through explicit comm
 - **Through a Fixlet:** it downloads the agent package and a small charter file, drops the charter beside the installer, and runs the installer silently. The charter carries everything the agent needs to configure itself.
 - **Manually:** an admin user runs the installer directly on a device currently running a BES Client.
 
+### What Windows versions does the agent support?
+Windows 10 and Windows 11, plus Windows Server 2016, 2019, and 2022 (64-bit). Windows 10 and Server 2016 are the minimum. Older releases (Windows 7, 8, 8.1, and Server 2012 R2 or earlier) aren't supported. The installer doesn't hard-check the OS version, so it won't stop you from installing on an older system, but those systems are missing components the agent needs, so it won't run correctly there.
+
 ### How do I set up a forwarder?
 1. Create the forwarder in the dashboard first. This gives you the forwarder's identity key.
 2. Install the forwarder software on the host, passing it the dashboard URL and that forwarder key.
@@ -111,7 +114,7 @@ It is a store-and-forward "relay." It serves only the agent reporting paths and 
 Agents talk to the dashboard directly whenever they can. A forwarder is used when an endpoint can't, or is not allowed to, reach the dashboard directly. Each forwarder is marked Internal or DMZ. If an administrator manually assigns agents to a forwarder, those agents will prefer an internal forwarder while on the corporate network and a DMZ forwarder when off it. A per-group policy can also prevent a group of endpoints from ever using an external forwarder.
 
 ### Why is the forwarder Windows-only? Will there be a Linux forwarder in the future?
-The forwarder currently ships for Windows. This is a packaging choice, not a technical limitation. The forwarder is a lightweight, platform-neutral relay, and it ships for Windows first because it is typically deployed alongside a BigFix relay host, which is most often Windows. A Linux forwarder may follow in a later release. If you need one, open an issue and let us know.
+The forwarder currently ships for Windows. This is a packaging choice, not a technical limitation. The forwarder is a lightweight, platform-neutral relay, and it ships for Windows first because it is typically deployed alongside a BigFix relay host, which is most often Windows. A Linux forwarder may follow in a later release. If you need one, open an issue and let me know.
 
 ### Is the agent to forwarder to dashboard path secure?
 Yes.

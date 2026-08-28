@@ -192,9 +192,11 @@ shape the project.
 |---|---|
 | BigFix Platform | BigFix Root Server v11.x REST API |
 | Dashboard OS | Ubuntu Server 24.04 LTS, 26.04 LTS |
-| Endpoint OS (agent) | Windows, Linux |
+| Endpoint OS (agent) | Windows 10 / Windows Server 2016 or newer (64-bit), Linux |
 | PostgreSQL | Installed automatically by the installer |
 | Browsers | Chrome, Edge, Firefox |
+
+**Supported OS versions are a soft requirement.** The installer does not perform a hard OS-version check, so nothing stops the agent from being installed on an older system. However, earlier operating systems are missing components the agent depends on, so the agent will not run correctly if it is installed on an unsupported OS.
 
 A BigFix **Master Operator** account is used for the optional cross-reference of
 BigFix's own last-report time against the agent's verdict. See the Installation
