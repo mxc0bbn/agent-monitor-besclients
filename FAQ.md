@@ -76,6 +76,16 @@ An event report identifying the machine and explaining the problem. It carries t
 
 On the moment an endpoint first becomes unhealthy, the agent also attaches a one-time diagnostic bundle for troubleshooting. This includes a tail of the client log plus network state, clock offset, free disk space, select client settings, and recent log errors. This bundle is sent only on the transition into unhealthy, not on every report.
 
+### Does the Health Agent take any action to fix a broken BES client, such as restarting it?
+No, and that's intentional.
+
+The Health Agent is deliberately report-only. It watches and reports. It doesn't start, stop, restart, or modify the BES client, and it has no ability to make any changes to the rest of the endpoint. I chose to limit the Health Agent's boundary to reporting for two reasons:
+
+1. Keeps its footprint small and its required privileges low.
+2. Its behavior is easy to trust and whitelist because it only observes and reports.
+
+When the BES client stops or hangs, Agent Monitor's job is to make that visible right away (as Unhealthy or Silent) and alert you, so the failure doesn't stay hidden. Detection and remediation stay cleanly separated. Agent Monitor tells you what's wrong. You decide how to fix it.
+
 ### How can you ensure that the report is not intercepted by a middleman that can read vital information about the endpoint?
 If report encryption is enabled for the tenant, the whole payload is encrypted before it leaves the machine. The diagnostic bundle is encrypted using a hybrid X25519 + ML-KEM-768 key encapsulation (a classical elliptic-curve key exchange paired with a post-quantum one), HKDF-SHA256 to derive the encryption key, and AES-256-GCM to encrypt the payload. Using a classical and a post-quantum method together means the protection holds even if either one is broken later, including by a future quantum computer.
 
@@ -95,7 +105,7 @@ An endpoint becomes Silent after 24 hours with no check-in. After 72 hours of be
 Yes, through a forwarder. The agent reports to a forwarder that does have a path to the dashboard. The forwarder passes the report along.
 
 ### How does the forwarder work?
-It is a store-and-forward "relay." It serves only the agent reporting paths and passes each request through untouched, adding only its own identifying header. If the dashboard is briefly unreachable, the forwarder holds the reports and replays them in order once the dashboard returns, answering the agent with an "accepted" in the meantime. It never decodes or reads the reports; it moves the exact bytes through in each direction.
+It is a store-and-forward "relay." It serves only the agent reporting paths and passes each request through untouched, adding only its own identifying header. If the dashboard is briefly unreachable, the forwarder holds the reports and replays them in order once the dashboard returns, answering the agent with an "accepted" in the meantime. It never decodes or reads the reports. It moves the exact bytes through in each direction.
 
 ### Do agents always go through a forwarder, or only when they need to?
 Agents talk to the dashboard directly whenever they can. A forwarder is used when an endpoint cannot, or is not allowed to, reach the dashboard directly. Each forwarder is marked Internal or DMZ. If an administrator manually assigns agents to a forwarder, those agents will prefer an internal forwarder while on the corporate network and a DMZ forwarder when off it. A per-group policy can also prevent a group of endpoints from ever using an external forwarder.
@@ -125,7 +135,7 @@ No. Access is multi-tenant and deny-by-default. A user sees only the tenants gra
 Not yet. Authenticator-app based MFA is on the roadmap. Today, access is protected by the password policy, account lockout, and rate limiting, and certain sensitive actions require you to re-enter your password before they proceed.
 
 ### Can I turn off the password reset email?
-The reset-link email is the recovery mechanism itself, so it always sends while self-service reset is enabled; there is no per-user switch to disable it. An administrator can disable self-service reset globally, in which case admins reset passwords directly from User Management. The separate "password changed" security notice is a normal notification you can control.
+The reset-link email is the recovery mechanism itself, so it always sends while self-service reset is enabled. There is no per-user switch to disable it. An administrator can disable self-service reset globally, in which case admins reset passwords directly from User Management. The separate "password changed" security notice is a normal notification you can control.
 
 ---
 
@@ -143,7 +153,7 @@ Either way, which tenant an endpoint belongs to is decided automatically from th
 Every agent has its own private key, generated on that endpoint and never shared. It signs every message it sends, and the dashboard verifies each one against that endpoint's enrolled key, confirms the message is recent and not a replay, and confirms the endpoint is enrolled and not revoked. A rogue device does not hold the private key, so it cannot produce a valid signature, and unsigned requests are always rejected.
 
 ### If I revoke an agent, can it re-enroll itself, or must I reinstall?
-A revoked agent can't quietly re-enroll itself; that's the point of revocation. There are two recovery paths:
+A revoked agent can't quietly re-enroll itself. That's the point of revocation. There are two recovery paths:
 
 - **Ordinary revoke:** an administrator can Restore the endpoint from the dashboard, which reactivates it with its same identity.
 - **Permanent revoke:** if you escalated to a permanent revocation, even Restore is refused, and the only way back is a fresh reinstall, which creates a brand-new identity.
@@ -159,7 +169,7 @@ The dashboard identifies an endpoint by its cryptographic identity, not its host
 ## 6. Encryption and Report Confidentiality (Strongbox)
 
 ### What is a "Strongbox"?
-Strongbox is the report-encryption subsystem, the sealed box a report travels in. Each tenant has its own encryption keypair. The dashboard holds the private half, and agents hold only the public half. That means an agent can encrypt a report so that only the dashboard can open it, and nothing in between (the network or a forwarder) can read it. Strongbox is opt-in per tenant, with three modes (off, optional, required), and it ships off by default. When a tenant is set to optional or required, that tenant's reports are encrypted end to end; when it is off, reports are protected only by the transport (TLS).
+Strongbox is the report-encryption subsystem, the sealed box a report travels in. Each tenant has its own encryption keypair. The dashboard holds the private half, and agents hold only the public half. That means an agent can encrypt a report so that only the dashboard can open it, and nothing in between (the network or a forwarder) can read it. Strongbox is opt-in per tenant, with three modes (off, optional, required), and it ships off by default. When a tenant is set to optional or required, that tenant's reports are encrypted end to end. When it is off, reports are protected only by the transport (TLS).
 
 ### Which encryption and signing algorithms does Agent Monitor use?
 - **Signatures (authenticity):** every agent report is signed. New agents use ML-DSA-65, a post-quantum signature standard (NIST FIPS 204), designed to stay secure even against future quantum computers.
@@ -177,7 +187,7 @@ Each tenant's public encryption key is delivered to its agents over their normal
 ### How does the dashboard know an agent build is legitimate?
 Every agent package carries a small signed statement naming the build's version, platform, and a fingerprint (a SHA-256 hash) of the exact binary. That statement is signed at release time with a private key that exists only on the developer's release systems and never ships in any product. The dashboard carries the matching public key built into its own code, and a public key can check a signature but can't create one, so it's safe to distribute.
 
-When an agent reports in, the dashboard checks two things. That the statement was really signed by the developer's key, and that the fingerprint in the statement matches the fingerprint the agent measured on its own binary. If they match, the build is recorded as known-good automatically. This works entirely offline; the dashboard never has to contact the developer to confirm.
+When an agent reports in, the dashboard checks two things. That the statement was really signed by the developer's key, and that the fingerprint in the statement matches the fingerprint the agent measured on its own binary. If they match, the build is recorded as known-good automatically. This works entirely offline. The dashboard never has to contact the developer to confirm.
 
 ### Can an attacker substitute a fake or tampered agent and have it accepted as genuine?
 No.
@@ -202,7 +212,7 @@ Because signing is yours to control. The unsigned download lets you take the age
 Yes. Just be aware that doing this may cause Windows Smartscreen to warn users before the executable runs and if your organization uses application control software like Applocker, it may block unsigned or unauthorized executables from running.
 
 ### Can a rogue administrator import a bad attestation to whitelist a malicious agent?
-No. The set of trusted developer keys is compiled into the dashboard; no screen, API, or file can add to it. The Import function on the Agent Builds page accepts only statements that are already signed by the developer, and the dashboard verifies that signature before writing anything.
+No. The set of trusted developer keys is compiled into the dashboard. No screen, API, or file can add to it. The Import function on the Agent Builds page accepts only statements that are already signed by the developer, and the dashboard verifies that signature before writing anything.
 
 ### Why do Linux builds show no thumbprint?
 The thumbprint is the fingerprint of a Windows code-signing certificate, which is a Windows-only mechanism. Linux has no equivalent OS signature to fingerprint, so the column is empty by nature, not by omission. Both platforms still carry the developer-signed build attestation.
@@ -215,7 +225,7 @@ The thumbprint is the fingerprint of a Windows code-signing certificate, which i
 No. The dashboard can run its own internal certificate authority and issue its own TLS certificate automatically, so HTTPS works out of the box with nothing to buy, but you can use your own certificate or a CA certificate you've bought instead.
 
 ### The dashboard runs its own internal certificate authority. Is that a weakness an auditor will flag?
-Not necessarily. Private, internal CAs are standard enterprise practice, the same pattern used by tools like Active Directory Certificate Services and HashiCorp Vault. Auditors do not flag "you run a private CA"; they look at how the CA key is protected, scoped, and managed. In this particular case:
+Not necessarily. Private, internal CAs are standard enterprise practice, the same pattern used by tools like Active Directory Certificate Services and HashiCorp Vault. Auditors do not flag "you run a private CA." They look at how the CA key is protected, scoped, and managed. In this particular case:
 
 - The CA private key is stored so the web application can't read it. It's used only to sign, and the web server only ever presents the issued certificate.
 - The CA is name-constrained to this deployment, so even a leaked CA key can't issue a valid certificate for an outside domain, and it can't create sub-authorities.
@@ -250,10 +260,10 @@ When a non-critical endpoint changes state, its agent holds the report for a sma
 No. Email alerts fire only when a critical endpoint turns unhealthy. Silent and Disagreement are shown on the dashboard but don't send email, because a Silent endpoint is often just powered off and a Disagreement usually resolves itself. This keeps alert emails meaningful rather than noisy.
 
 ### Can I stop alerts during planned maintenance?
-Yes. Schedule a maintenance window for the endpoints, group, or tenant you're working on, and the dashboard suppresses their alerts for that period, then resumes normal alerting automatically when the window ends. Health changes are still recorded during the window; they just don't raise alerts, so planned reboots and patching don't set off a storm. Endpoints in a window show a Maintenance label.
+Yes. Schedule a maintenance window for the endpoints, group, or tenant you're working on, and the dashboard suppresses their alerts for that period, then resumes normal alerting automatically when the window ends. Health changes are still recorded during the window. They just don't raise alerts, so planned reboots and patching don't set off a storm. Endpoints in a window show a Maintenance label.
 
 ### Why did an alert email show a tenant name I didn't set, and can I rename a tenant?
-There's no global "rename tenant." A tenant's stored name comes from its BigFix masthead. What you can set is a per-user alias. Each dashboard account can label tenants its own way, and every screen shows your alias. Because alert emails go to specific recipients, an email uses the alias belonging to the account that owns that recipient's address; a recipient address with no matching account sees the stored name. So if one person has two accounts, set the alias on both to keep it consistent.
+There's no global "rename tenant." A tenant's stored name comes from its BigFix masthead. What you can set is a per-user alias. Each dashboard account can label tenants its own way, and every screen shows your alias. Because alert emails go to specific recipients, an email uses the alias belonging to the account that owns that recipient's address. A recipient address with no matching account sees the stored name. So if one person has two accounts, set the alias on both to keep it consistent.
 
 ---
 
