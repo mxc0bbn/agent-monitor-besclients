@@ -55,6 +55,14 @@
 //   CHANGE_ME_CHARTER        the charter file name (a .charter)
 //   CHANGE_ME_CA_CERT        the signing CA public certificate file name (a
 //                            .crt), only if you code-signed the Windows agent
+//   CHANGE_ME_WINDOWS_SHA256 the SHA-256 of the Windows package (from the
+//                            release SHA256SUMS; lowercase hex)
+//   CHANGE_ME_LINUX_SHA256   the SHA-256 of the Linux package (from the
+//                            release SHA256SUMS; lowercase hex)
+//
+// The two SHA-256 values are verified after download and the action HALTS on any
+// mismatch, so a tampered or wrong package is never extracted or run. Copy them
+// from the SHA256SUMS file published with the release.
 //
 // The charter, downloaded beside the installer, carries the dashboard URL,
 // the enrollment key, and the trust anchor, so no parameters are needed.
@@ -66,6 +74,10 @@ if {windows of operating system}
     delete agent-signing-ca.crt
 
     download now as agent.zip CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_WINDOWS_PKG
+    // Verify the package against its published SHA-256 before extracting or
+    // running it. If the download was tampered or is the wrong file, the hash
+    // will not match and the action stops here (nothing is extracted or run).
+    continue if {(sha256 of file "agent.zip" of folder "__Download" of client folder of current site) as string = "CHANGE_ME_WINDOWS_SHA256"}
     download now as dashboard.charter CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_CHARTER
 
     // Extract the package, then drop the charter beside the setup program so
@@ -96,6 +108,9 @@ elseif {linux of operating system}
     delete dashboard.charter
 
     download now as agent.tar.gz CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_LINUX_PKG
+    // Verify the package against its published SHA-256 before extracting or
+    // running it. On any mismatch the action stops here (nothing is run).
+    continue if {(sha256 of file "agent.tar.gz" of folder "__Download" of client folder of current site) as string = "CHANGE_ME_LINUX_SHA256"}
     download now as dashboard.charter CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_CHARTER
 
     // Extract the package, then drop the charter beside install.sh so the
