@@ -125,7 +125,7 @@ Yes.
 - When report encryption is enabled, the report itself is encrypted end to end.
 
 ### If someone compromised a forwarder, could they read the diagnostic bundles?
-With report encryption enabled, no. The report body is a sealed "strongbox" that only the dashboard can open, so a compromised forwarder sees only a locked envelope and some metadata (who talked to the dashboard, when, and from what address), never the contents. And regardless of encryption, every report is signed by the agent, so a compromised forwarder can never forge or alter a report, and its own credential can be revoked at any time. (If report encryption is off for a tenant, the body would be visible to a compromised forwarder, which is exactly why encryption exists for untrusted-network path scenarios.)
+With report encryption enabled, no. The report body is an encrypted "strongbox" that only the dashboard can open, so a compromised forwarder sees only an encrypted envelope and some metadata (who talked to the dashboard, when, and from what address), never the contents. And regardless of encryption, every report is signed by the agent, so a compromised forwarder can never forge or alter a report, and its own credential can be revoked at any time. (If report encryption is off for a tenant, the body would be visible to a compromised forwarder, which is exactly why encryption exists for untrusted-network path scenarios.)
 
 ---
 
@@ -175,7 +175,7 @@ The dashboard identifies an endpoint by its cryptographic identity, not its host
 ## 6. Encryption and Report Confidentiality (Strongbox)
 
 ### What is a "Strongbox"?
-Strongbox is the report-encryption subsystem, the sealed box a report travels in. Each tenant has its own encryption keypair. The dashboard holds the private half, and agents hold only the public half. That means an agent can encrypt a report so that only the dashboard can open it, and nothing in between (the network or a forwarder) can read it. Strongbox is opt-in per tenant, with three modes (off, optional, required), and it ships off by default. When a tenant is set to optional or required, that tenant's reports are encrypted end to end. When it is off, reports are protected only by the transport (TLS).
+Strongbox is the report-encryption subsystem, the encrypted box a report travels in. Each tenant has its own encryption keypair. The dashboard holds the private half, and agents hold only the public half. That means an agent can encrypt a report so that only the dashboard can open it, and nothing in between (the network or a forwarder) can read it. Strongbox is opt-in per tenant, with three modes (off, optional, required), and it ships off by default. When a tenant is set to optional or required, that tenant's reports are encrypted end to end. When it is off, reports are protected only by the transport (TLS).
 
 ### Which encryption and signing algorithms does Agent Monitor use?
 - **Signatures (authenticity):** every agent report is signed. Agents use ML-DSA-65, a post-quantum signature standard (NIST FIPS 204), designed to stay secure even against future quantum computers.

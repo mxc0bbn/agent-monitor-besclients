@@ -12,7 +12,7 @@ Thumbs.db
 *.bak
 *.bak-*
 
-# Secrets / keys / certs — never commit (belt-and-suspenders; no source lives here)
+# Secrets / keys / certs, never commit (belt-and-suspenders; no source lives here)
 .env
 .env.*
 *.key
