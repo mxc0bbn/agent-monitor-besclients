@@ -104,7 +104,7 @@ Initial public release.
 ### Added
 - **Out-of-band health monitoring** for BigFix (BES) client endpoints. A
   lightweight agent on each endpoint reports independently of the BES client,
-  so a broken client is distinguished from one that is merely powered off,
+  so an unhealthy client is distinguished from one that is merely powered off,
   isolated, or slow to check in.
 - **Heartbeat and diagnostic reporting.** Every agent run sends a small
   heartbeat; a richer diagnostic bundle is sent only when the agent's local

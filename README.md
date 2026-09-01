@@ -2,7 +2,7 @@
 
 A self-hosted web application that monitors the health of BigFix (BES) client
 endpoints out-of-band. A lightweight agent on each endpoint reports
-independently of the BES client, so you can tell a genuinely broken client apart
+independently of the BES client, so you can tell a genuinely unhealthy client apart
 from one that is merely powered off, network-isolated, or just slow to check in.
 
 > **Have questions before you download or try it?** The
@@ -17,8 +17,8 @@ from one that is merely powered off, network-isolated, or just slow to check in.
 ## Why Agent Monitor
 
 In BigFix, much of the intelligence lives on the client. When the BES client
-breaks, none of the native BigFix interfaces (Console, Web Reports, WebUI) can
-distinguish "broken" from "powered off," "isolated," or "hasn't reported yet";
+stops working, none of the native BigFix interfaces (Console, Web Reports, WebUI) can
+distinguish "unhealthy" from "powered off," "isolated," or "hasn't reported yet";
 a missing report is silent by design.
 
 **Agent Monitor** closes that gap with a dedicated out-of-band channel. A small
@@ -26,7 +26,7 @@ agent runs on each endpoint, independent of the BES client, and reports to a
 self-hosted appliance. The dashboard surfaces two things the BigFix interfaces
 cannot:
 
-- **Unhealthy**: the agent's own local checks say the client is broken.
+- **Unhealthy**: the agent's own local checks say the client is not working correctly.
 - **Silent**: the agent has stopped reporting, so the endpoint may be down or
   cut off.
 

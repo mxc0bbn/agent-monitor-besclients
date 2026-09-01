@@ -79,7 +79,7 @@ An event report identifying the machine and explaining the problem. It carries t
 
 The agent also attaches a one-time diagnostic bundle for troubleshooting. This includes a tail of the client log plus network state, clock offset, free disk space, select client settings, and recent log errors. This bundle is sent only on the transition into unhealthy, not on every report.
 
-### Does the Health Agent take any action to fix a broken BES client, such as restarting it?
+### Does the Health Agent take any action to fix an unhealthy BES client, such as restarting it?
 No, and that's intentional.
 
 The Health Agent is deliberately report-only. It watches and reports. It doesn't start, stop, restart, or modify the BES client, and it has no ability to make any changes to the rest of the endpoint. I chose to limit the Health Agent's boundary to reporting for two reasons:
@@ -93,8 +93,8 @@ When the BES client stops or hangs, Agent Monitor's job is to make that visible 
 If report encryption is enabled for the tenant, the whole payload is encrypted before it leaves the machine. The diagnostic bundle is encrypted using a hybrid X25519 + ML-KEM-768 key encapsulation (a classical elliptic-curve key exchange paired with a post-quantum one), HKDF-SHA256 to derive the encryption key, and AES-256-GCM to encrypt the payload. Using a classical and a post-quantum method together means the protection holds even if either one is broken later, including by a future quantum computer.
 
 ### What is the difference between Unhealthy, Silent, and Disagreement?
-- **Unhealthy:** The agent's own checks say the BES Client is broken.
-- **Silent:** The agent itself has stopped checking in. This could simply mean that the machine may be off, cut off from the network, or the health agent itself may be broken.
+- **Unhealthy:** The agent's own checks say the BES Client is not working correctly.
+- **Silent:** The agent itself has stopped checking in. This could simply mean that the machine may be off, cut off from the network, or the health agent itself may have stopped working.
 - **Disagreement:** The agent is Silent for too long.
 
 ### How long before an endpoint is Silent, and before it becomes a Disagreement?
