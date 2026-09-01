@@ -22,12 +22,18 @@ their paces against real environments and report what they found.
 
 ## Beta testing
 
-- **Pawan Kumar** - Beta tested pre-release builds against a live environment
+- **[Pawan Kumar](https://github.com/HCL-PawanWorks)** - Beta tested pre-release builds against a live environment
   and surfaced installation issues that shaped the 2.7.2 release. His validation
   identified a certificate name mismatch that blocked agent enrollment under
   strict TLS verification, and the agent's inability to locate BigFix when the
   client or its server components were installed outside the default
   directories. Both became out-of-the-box installation fixes in that release.
+
+- Thanks also to additional collaborators who tested pre-release builds against
+  external endpoints and whose feedback shaped two design decisions: placing the
+  Windows code-signing certificate under the customer's own control, and
+  strengthening the cryptographic design to post-quantum algorithms in place of
+  the classical scheme originally planned.
 
 ---
 
