@@ -6,6 +6,29 @@ The format follows [Keep a Changelog](https://keepachangelog.com/).
 For full release notes (upgrade instructions, assets, checksums) see the
 [Releases page](https://github.com/mxc0bbn/agent-monitor-besclients/releases).
 
+## [v2.8.1] - 2026-09-01
+
+### Security
+- **Dashboard TLS verification on by default.** Agents verify the dashboard's TLS
+  certificate out of the box. The dashboard's certificate authority travels
+  inside the agent package, so a manual install authenticates the dashboard with
+  no extra steps and fails closed if it cannot. The installer also accepts a
+  `--ca-cert-path` option to provide the certificate explicitly.
+- **Dashboard self-integrity check.** The dashboard verifies the integrity of its
+  own code before it starts and refuses to start if anything was altered.
+- **Full certificate chain in the Windows agent signature,** so endpoints can
+  build the trust path to the signing certificate you own.
+- **Additional hardening** across the platform following an independent assessment
+  of the source code.
+
+### Added
+- **Visibility filter on the Recent Activity view** (Visible, Hidden, or All),
+  matching the Registered Endpoints tab, to surface events from endpoints that
+  are hidden or were uninstalled.
+
+### Fixed
+- Installation reliability improvements for manual installs on Linux and Windows.
+
 ## [v2.8.0] - 2026-08-24
 
 ### Added
