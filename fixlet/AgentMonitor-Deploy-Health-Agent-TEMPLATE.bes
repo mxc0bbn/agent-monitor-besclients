@@ -23,10 +23,10 @@
 <li>Linux: <code>/opt/agentmonitor/</code>, plus the <code>agentmonitor.timer</code> systemd timer and the watchdog service.</li>
 </ul>
 
-<p><strong>Notes:</strong> This template assumes the official Agent Monitor package layout (the Windows package extracts to an <code>AgentMon-Agent</code> folder containing <code>AgentMon-Agent-Setup.exe</code>; the Linux package extracts to an <code>agentmonitor</code> folder containing <code>install.sh</code>). Renaming the downloaded files is fine; do not repackage their contents. The applicability check below targets version 2.8.0.0; adjust it if you deploy a different version.</p>
+<p><strong>Notes:</strong> This template assumes the official Agent Monitor package layout (the Windows package extracts to an <code>AgentMon-Agent</code> folder containing <code>AgentMon-Agent-Setup.exe</code>; the Linux package extracts to an <code>agentmonitor</code> folder containing <code>install.sh</code>). Renaming the downloaded files is fine; do not repackage their contents. The applicability check below targets version 2.8.1.0; adjust it if you deploy a different version.</p>
         ]]></Description>
         <Relevance>(windows of operating system) OR (linux of operating system)</Relevance>
-        <Relevance><![CDATA[if (windows of operating system) then (((not exists file ((native program files folder) as string & "\AgentMonitor\AgentMonitor.exe")) OR (version of file ((native program files folder) as string & "\AgentMonitor\AgentMonitor.exe") < "2.8.0.0" as version))) else (if linux of operating system then (((not exists file "/etc/agentmonitor/VERSION") OR ((line 1 of file "/etc/agentmonitor/VERSION" as trimmed string) as version < "2.8.0.0" as version))) else (False))]]></Relevance>
+        <Relevance><![CDATA[if (windows of operating system) then (((not exists file ((native program files folder) as string & "\AgentMonitor\AgentMonitor.exe")) OR (version of file ((native program files folder) as string & "\AgentMonitor\AgentMonitor.exe") < "2.8.1.0" as version))) else (if linux of operating system then (((not exists file "/etc/agentmonitor/VERSION") OR ((line 1 of file "/etc/agentmonitor/VERSION" as trimmed string) as version < "2.8.1.0" as version))) else (False))]]></Relevance>
         <Category>Software Distribution</Category>
         <DownloadSize>0</DownloadSize>
         <Source>Agent Monitor</Source>
