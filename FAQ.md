@@ -205,8 +205,8 @@ No.
 ### Why is the Windows agent signed with a code-signing certificate?
 On Windows, executables carry an embedded code-signing signature that the operating system itself can verify, so signing the Windows agent lets your Windows endpoints confirm the agent is the one you approved.
 
-### Why do I need to own that certificate?
-Because if I as the developer owned that certificate then I could create any software that your endpoints would implicitly trust. By owning the signing certificate yourself, no one outside your organization holds a key your endpoints trust, and you can replace the certificate at any time. The Linux agent is verified through the build attestation above and needs no signing.
+### Why do you need to own that certificate?
+Because if I owned that certificate then I could create any software that your endpoints would implicitly trust. By owning the signing certificate yourself, no one outside your organization holds a key your endpoints trust, and you can replace the certificate at any time. The Linux agent is verified through the build attestation above and needs no signing.
 
 ### Do I absolutely have to generate a signing certificate in the dashboard?
 No. If you already have a code signing certificate that you own, you can use it to sign the Windows agents. Note: a BYO certificate does need to be one your Windows endpoints already trust, meaning it chains to a CA in their trust store. This is normally the case for a cert from your internal PKI or a public CA.
