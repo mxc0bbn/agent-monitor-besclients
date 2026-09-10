@@ -23,10 +23,10 @@
 <li>Linux: <code>/opt/agentmonitor/</code>, plus the <code>agentmonitor.timer</code> systemd timer and the watchdog service.</li>
 </ul>
 
-<p><strong>Notes:</strong> This template assumes the official Agent Monitor package layout (the Windows package extracts to an <code>AgentMon-Agent</code> folder containing <code>AgentMon-Agent-Setup.exe</code>; the Linux package extracts to an <code>agentmonitor</code> folder containing <code>install.sh</code>). Renaming the downloaded files is fine; do not repackage their contents. The applicability check below targets version 2.8.1.0; adjust it if you deploy a different version.</p>
+<p><strong>Notes:</strong> This template assumes the official Agent Monitor package layout (the Windows package extracts to an <code>AgentMon-Agent</code> folder containing <code>AgentMon-Agent-Setup.exe</code>; the Linux package extracts to an <code>agentmonitor</code> folder containing <code>install.sh</code>). Renaming the downloaded files is fine; do not repackage their contents. The applicability check below targets version 2.9.0.0; adjust it if you deploy a different version.</p>
         ]]></Description>
         <Relevance>(windows of operating system) OR (linux of operating system)</Relevance>
-        <Relevance><![CDATA[if (windows of operating system) then (((not exists file ((native program files folder) as string & "\AgentMonitor\AgentMonitor.exe")) OR (version of file ((native program files folder) as string & "\AgentMonitor\AgentMonitor.exe") < "2.8.1.0" as version))) else (if linux of operating system then (((not exists file "/etc/agentmonitor/VERSION") OR ((line 1 of file "/etc/agentmonitor/VERSION" as trimmed string) as version < "2.8.1.0" as version))) else (False))]]></Relevance>
+        <Relevance><![CDATA[if (windows of operating system) then (((not exists file ((native program files folder) as string & "\AgentMonitor\AgentMonitor.exe")) OR (version of file ((native program files folder) as string & "\AgentMonitor\AgentMonitor.exe") < "2.9.0.0" as version))) else (if linux of operating system then (((not exists file "/etc/agentmonitor/VERSION") OR ((line 1 of file "/etc/agentmonitor/VERSION" as trimmed string) as version < "2.9.0.0" as version))) else (False))]]></Relevance>
         <Category>Software Distribution</Category>
         <DownloadSize>0</DownloadSize>
         <Source>Agent Monitor</Source>
@@ -55,6 +55,8 @@
 //   CHANGE_ME_CHARTER        the charter file name (a .charter)
 //   CHANGE_ME_CA_CERT        the signing CA public certificate file name (a
 //                            .crt), only if you code-signed the Windows agent
+//   CHANGE_ME_DASHBOARD_CA   the dashboard Root CA file name (a .crt), from
+//                            Administration > System Settings > Agent Builds
 //   CHANGE_ME_WINDOWS_SHA256 the SHA-256 of the Windows package (from the
 //                            release SHA256SUMS; lowercase hex)
 //   CHANGE_ME_LINUX_SHA256   the SHA-256 of the Linux package (from the
@@ -72,6 +74,7 @@ if {windows of operating system}
     delete agent.zip
     delete dashboard.charter
     delete agent-signing-ca.crt
+    delete dashboard-ca.crt
 
     download now as agent.zip CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_WINDOWS_PKG
     // Verify the package against its published SHA-256 before extracting or
@@ -94,6 +97,16 @@ if {windows of operating system}
     download now as agent-signing-ca.crt CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_CA_CERT
     waithidden powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Copy-Item -Path '{pathname of file "agent-signing-ca.crt" of folder "__Download" of client folder of current site}' -Destination 'C:\temp\agentmonitor\AgentMon-Agent\agent-signing-ca.crt' -Force"
     // ---------------------------------------------------------------------------
+    // --- DASHBOARD ROOT CA (recommended) ----------------------------------------
+    // Delivers the dashboard's own Root CA beside the installer so the agent can
+    // verify the dashboard from its first contact, and so an upgrade never leaves
+    // an endpoint unable to report. Download it from Administration > System
+    // Settings > Agent Builds (DOWNLOAD DASHBOARD ROOT CA). The installer uses it
+    // only after confirming it validates the live dashboard. Delete these two
+    // lines if your dashboard runs on a bring-your-own certificate.
+    download now as dashboard-ca.crt CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_DASHBOARD_CA
+    waithidden powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Copy-Item -Path '{pathname of file "dashboard-ca.crt" of folder "__Download" of client folder of current site}' -Destination 'C:\temp\agentmonitor\AgentMon-Agent\dashboard-ca.crt' -Force"
+    // ---------------------------------------------------------------------------
 
     waithidden powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem -Path 'C:\temp\agentmonitor' -Recurse -File | Unblock-File"
 
@@ -106,6 +119,7 @@ elseif {linux of operating system}
 
     delete agent.tar.gz
     delete dashboard.charter
+    delete dashboard-ca.crt
 
     download now as agent.tar.gz CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_LINUX_PKG
     // Verify the package against its published SHA-256 before extracting or
@@ -117,6 +131,11 @@ elseif {linux of operating system}
     // installer picks it up automatically.
     wait /bin/sh -c "rm -rf /tmp/agentmonitor && /bin/tar -xzf '{pathname of file "agent.tar.gz" of folder "__Download" of client folder of current site}' -C /tmp"
     wait /bin/sh -c "cp '{pathname of file "dashboard.charter" of folder "__Download" of client folder of current site}' /tmp/agentmonitor/dashboard.charter"
+    // --- DASHBOARD ROOT CA (recommended) ----------------------------------------
+    // Same purpose as on Windows: lets the agent verify the dashboard from its
+    // first contact. Delete these two lines for a bring-your-own certificate.
+    download now as dashboard-ca.crt CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_DASHBOARD_CA
+    wait /bin/sh -c "cp '{pathname of file "dashboard-ca.crt" of folder "__Download" of client folder of current site}' /tmp/agentmonitor/dashboard-ca.crt"
     wait /bin/chmod +x /tmp/agentmonitor/install.sh
 
     // Run the installer silently. A fresh machine installs; an existing agent is upgraded in place.

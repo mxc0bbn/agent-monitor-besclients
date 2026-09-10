@@ -60,6 +60,8 @@ no telemetry.
   agent reports.
 - **Role-Based Access with Tenant Scoping**: Multiple roles, with non-admin
   users scoped to their tenant on a deny-by-default basis.
+- **Multi-Factor Authentication**: Authenticator-app (TOTP) sign-in for the
+  dashboard, self-hosted, with recovery codes and trusted browsers.
 - **Security Hardening**: Password policies, account lockout, encrypted
   credential storage, TLS by default, and a startup integrity manifest over the
   distributed files.
@@ -150,6 +152,7 @@ Agent Monitor ships with security as a default posture, not an afterthought:
 - **Post-quantum (ML-DSA) build attestation and report signing**
 - **Startup integrity manifest over distributed files**
 - **Hardened file permissions and process isolation**
+- **Multi-factor authentication for dashboard sign-in**
 - **Audit logging**
 
 ---

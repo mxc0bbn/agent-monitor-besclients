@@ -6,6 +6,41 @@ The format follows [Keep a Changelog](https://keepachangelog.com/).
 For full release notes (upgrade instructions, assets, checksums) see the
 [Releases page](https://github.com/mxc0bbn/agent-monitor-besclients/releases).
 
+## [v2.9.0] - 2026-09-10
+
+### Added
+- **Multi-factor authentication.** Authenticator-app (TOTP) sign-in for the
+  dashboard, working with any standard authenticator app and needing no
+  third-party service. Users enroll under My Account; an administrator can
+  require it for everyone under Administration > System Settings > Security.
+  Includes recovery codes, trusted browsers for a set number of days, and
+  administrator reset of a user's MFA.
+- **Dashboard Root CA download.** Administration > System Settings > Agent
+  Builds now offers the dashboard's own Root CA beside the Agent Trust Cert, so
+  all the files a Fixlet deployment needs come from one place.
+
+### Fixed
+- **Upgrades no longer fail on files left by a previous install.** The
+  installer's upgrade mode now moves any file the new release no longer ships
+  out of the protected tree (into a backup folder, nothing is deleted) before
+  the integrity check runs, instead of refusing to start.
+- **Agent trust recovery after an upgrade.** An endpoint whose stored trust
+  anchor no longer matched the dashboard could stop reporting once strict
+  verification was turned on. The installer and the agent's runtime self-repair
+  now fall back to the dashboard's own Root CA carried in the package, or
+  delivered beside the installer, validating it against the live dashboard
+  before use.
+- **Ubuntu 24.04 support restored.** The dashboard again ships compiled
+  modules for both Python 3.12 (Ubuntu 24.04) and 3.14 (Ubuntu 26.04).
+- **Windows scheduled-task cadence.** Applying the dashboard-pushed check-in
+  interval to the Windows task failed silently; it now takes effect.
+
+### Changed
+- **Health Agent 2.9.0.0**, version-aligned with the dashboard. The resident
+  watchdog now polices its own memory and restarts itself if it ever exceeds a
+  fixed ceiling; on Linux the service limits were tuned to stop needless
+  reclaim throttling.
+
 ## [v2.8.1] - 2026-09-01
 
 ### Security

@@ -40,6 +40,9 @@ Both are supported. The installer gets its settings either through explicit comm
 ### What Windows versions does the agent support?
 Windows 10 and Windows 11, plus Windows Server 2016, 2019, and 2022 (64-bit). Windows 10 and Server 2016 are the minimum. Older releases (Windows 7, 8, 8.1, and Server 2012 R2 or earlier) aren't supported. The installer doesn't hard-check the OS version, so it won't stop you from installing on an older system, but those systems are missing components the agent needs, so it won't run correctly there.
 
+### Why isn't the agent available for macOS devices?
+Because of how Apple requires software to be signed. On Windows and Linux the agent is verified with certificates you own: you sign the Windows agent with your own certificate, and the Linux agent is checked against a published build fingerprint. Apple works differently. For an application to run normally on a Mac, Apple requires it to be signed with an Apple Developer ID that belongs to the software's publisher and then submitted to Apple for notarization, a check Apple performs on every build. That identity would have to be mine, not yours, and it cannot be replaced by a certificate from your own PKI. A design principle of Agent Monitor is that your endpoints never rely on a certificate the developer controls, and a free product cannot carry a paid Apple identity and a per-build Apple approval on every customer's behalf. Rather than ship a Mac agent that either bypasses Apple's checks or breaks that principle, the macOS agent is not offered and is not planned. Windows and Linux cover the platforms where the BES Client is most commonly deployed.
+
 ### How do I set up a forwarder?
 1. Create the forwarder in the dashboard first. This gives you the forwarder's identity key.
 2. Install the forwarder software on the host, passing it the dashboard URL and that forwarder key.
@@ -138,7 +141,7 @@ The dashboard follows standard secure-development practices. User input is alway
 No. Access is multi-tenant and deny-by-default. A user sees only the tenants granted to them, and that boundary is enforced on the server for every request, not in the browser. Roles are checked on the server for every action, and a session token can't be altered to grant privileges the account does not actually have. Sensitive administrative actions are recorded in the audit log.
 
 ### Is there multi-factor authentication (MFA)?
-Not yet. Authenticator-app based MFA is on the roadmap. Today, access is protected by the password policy, account lockout, and rate limiting, and certain sensitive actions require you to re-enter your password before they proceed.
+Yes, as of 2.9.0. Agent Monitor supports authenticator-app (TOTP) multi-factor authentication that works with any standard app, such as Google Authenticator, Microsoft Authenticator, or Authy. It is fully self-hosted and needs no third-party service. Each user enrolls under My Account, and an administrator can require it for everyone from Administration > System Settings > Security. Recovery codes cover a lost phone, a user can mark a browser as trusted for a set number of days, and an administrator can reset a user's MFA. Codes are single-use, attempts are rate-limited and locked out the same way passwords are, and the secret is encrypted at rest.
 
 ### Can I turn off the password reset email?
 The reset-link email is the recovery mechanism itself, so it always sends while self-service reset is enabled. There is no per-user switch to disable it. An administrator can disable self-service reset globally, in which case admins reset passwords directly from User Management. The separate "password changed" security notice is a normal notification you can control.
