@@ -36,6 +36,12 @@ For full release notes (upgrade instructions, assets, checksums) see the
   interval to the Windows task failed silently; it now takes effect.
 
 ### Changed
+- **Alert emails list endpoints in a table.** A bundled alert email now shows
+  one row per alert (alert id, hostname, tenant, severity, status, time
+  raised, and the verdict reason such as "BESClient service not running"),
+  grouped by tenant when a bundle spans more than one, and capped at 100 rows
+  with a pointer to the Alerts page. Times are shown in the dashboard's
+  display timezone.
 - **Health Agent 2.9.0.0**, version-aligned with the dashboard. The resident
   watchdog now polices its own memory and restarts itself if it ever exceeds a
   fixed ceiling; on Linux the service limits were tuned to stop needless
