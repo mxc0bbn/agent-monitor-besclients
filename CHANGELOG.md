@@ -15,6 +15,10 @@ For full release notes (upgrade instructions, assets, checksums) see the
   require it for everyone under Administration > System Settings > Security.
   Includes recovery codes, trusted browsers for a set number of days, and
   administrator reset of a user's MFA.
+- **Signed Windows downloads are self-contained.** A signed agent package
+  downloaded from the dashboard carries your signing certificate and the
+  dashboard's Root CA beside the installer, so a manual install needs only the
+  package and the charter.
 - **Dashboard Root CA download.** Administration > System Settings > Agent
   Builds now offers the dashboard's own Root CA beside the Agent Trust Cert, so
   all the files a Fixlet deployment needs come from one place.
