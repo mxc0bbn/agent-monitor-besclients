@@ -178,10 +178,12 @@ The full [Installation Guide](docs/AgentMonitor-Installation-Guide.pdf) and
 maintained in [`docs/`](docs/) in this repository for browsing without
 downloading a release.
 
-**Deploy through BigFix:** a template deploy Fixlet is included at
-[`fixlet/AgentMonitor-Deploy-Health-Agent-TEMPLATE.bes`](fixlet/AgentMonitor-Deploy-Health-Agent-TEMPLATE.bes).
-Import it into your BigFix Console and edit the placeholders (the download location and
-the file names) before use; the Fixlet's own description walks through the steps.
+**Deploy through BigFix:** template deploy Fixlets are included for the Health Agent
+([`fixlet/AgentMonitor-Deploy-Health-Agent-TEMPLATE.bes`](fixlet/AgentMonitor-Deploy-Health-Agent-TEMPLATE.bes))
+and for the DMZ Forwarder
+([`fixlet/AgentMonitor-Deploy-Forwarder-TEMPLATE.bes`](fixlet/AgentMonitor-Deploy-Forwarder-TEMPLATE.bes)).
+Import one into your BigFix Console and edit the placeholders (the download location and
+the file names) before use. Each Fixlet's own description walks through the steps.
 
 See [CHANGELOG.md](CHANGELOG.md) for a release history summary and
 [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) for the contributors who have helped

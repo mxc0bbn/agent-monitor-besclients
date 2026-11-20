@@ -6,6 +6,50 @@ The format follows [Keep a Changelog](https://keepachangelog.com/).
 For full release notes (upgrade instructions, assets, checksums) see the
 [Releases page](https://github.com/mxc0bbn/agent-monitor-besclients/releases).
 
+## [v2.9.1] - 2026-11-19
+
+Dashboard 2.9.1 and Health Agent 2.9.0.1. The DMZ Forwarder stays at 2.8.0.
+
+### Added
+- **Forwarder deploy Fixlet template.**
+  `fixlet/AgentMonitor-Deploy-Forwarder-TEMPLATE.bes` installs or upgrades the
+  DMZ Forwarder from the BigFix Console. It asks for the dashboard URL,
+  forwarder key, and forwarder name when you take the action.
+
+### Changed
+- **Server Status light shows overall health.** The header light now reflects
+  the database, every configured BigFix server, disk space, and database load,
+  with one plain line for each in its popover. Any signed-in user can see it.
+- **Email subjects use the product name.** Alert and notification subjects now
+  start with `[Agent Monitor]` (previously `[BFH]` and
+  `[BigFix Health Dashboard]`), and the default sender name is "Agent Monitor".
+  Update any mail rule that matches the old prefix.
+- **Back button moves between views.** Changing tab, Endpoints subtab, or
+  administration page adds a browser history entry.
+- **Columns menus have up and down buttons** as an alternative to dragging.
+- **The filter panel shows how many filters are active**, including while it
+  is collapsed.
+- **Esc closes the open dialog.** The idle-timeout warning is the exception.
+
+### Fixed
+- **New and reset users can change their password.** A user created by an
+  administrator, or one whose password an administrator reset, was refused
+  when submitting the required new password and could never reach the
+  dashboard.
+- **Dashboard starts on SQLAlchemy 2.1.** A fresh install that took the newest
+  library versions failed at startup with `No module named 'psycopg'`.
+- **Exporting a large audit log as PDF no longer stalls the dashboard.** The
+  PDF now holds the most recent 5,000 matching entries and says how many there
+  are in total. The CSV export still returns everything.
+- **Importing an agent package no longer fails after endpoints have
+  reported** that version.
+- **Linux Health Agent package installs when extracted by root.** The 2.9.0.0
+  Linux package recorded a group-writable top folder, so an install run by a
+  Fixlet stopped with "Refusing to install from an insecure staging location".
+- **Linux Health Agent keeps reporting on slow-booting hosts.** On a host that
+  took more than two minutes to start its timers, the agent's self-check timer
+  never fired again until the next reboot and the endpoint showed Silent.
+
 ## [v2.9.0] - 2026-09-10
 
 ### Added

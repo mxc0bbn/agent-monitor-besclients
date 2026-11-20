@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+    <Fixlet>
+        <Title>TEMPLATE: Install or Upgrade the Agent Monitor Forwarder (edit before use)</Title>
+        <Description><![CDATA[
+<p><strong>This is a template Fixlet. You must edit the action script before it will run.</strong> Replace the <code>CHANGE_ME_...</code> placeholders with your download location, the package file name, and its SHA-256. They are called out at the top of the action script.</p>
+
+<p><strong>What it does:</strong> installs or upgrades the Agent Monitor Forwarder on a Windows host. The forwarder is the optional relay that carries Health Agent reports to the dashboard from network segments that cannot reach it directly. The action downloads the forwarder package from a location you host, verifies it, extracts it, and runs the installer silently with the three values you enter when you take the action.</p>
+
+<p><strong>Before you deploy:</strong></p>
+<ol>
+<li>In the dashboard, under Administration, then System Settings, then Forwarders: register the forwarder. Give it a name, choose its placement, and enter the TLS names agents will use to reach it. The dashboard creates a forwarder key for it (it begins with <code>bch-</code>).</li>
+<li>Download the forwarder package from the Agent Monitor release assets and place it where the forwarder host can download it, for example the BigFix Root Server's <code>wwwrootbes</code> folder.</li>
+<li>Edit the action script below: set the download URL, the package file name, and the package SHA-256 from the release SHA256SUMS file.</li>
+<li>Take the action against the one host that will run this forwarder. You are asked for the dashboard URL, the forwarder key, and the forwarder name.</li>
+</ol>
+
+<p><strong>Target one host per forwarder.</strong> Each forwarder has its own key and name, so take a separate action for each forwarder host. This Fixlet is relevant on every Windows computer that does not have the current forwarder, so choose the target by name. Do not target all relevant computers.</p>
+
+<p><strong>About the forwarder key:</strong> the values you enter become part of the action, so anyone who can view that action in the BigFix Console can read the key. Limit who can see the action. If a key is exposed, revoke it on the Forwarders page and register the forwarder again.</p>
+
+<p><strong>What gets installed:</strong> <code>C:\Program Files\AgentMonitorForwarder\</code>, the auto-start Windows service <code>AgentMonitorForwarder</code> (restarts on failure), and a Windows Firewall rule that allows inbound TCP 31313 to the forwarder program. With the default certificate mode the forwarder obtains and renews its TLS certificate from the dashboard, so there is no certificate to deliver.</p>
+
+<p><strong>Upgrades:</strong> on a host that already runs the forwarder, the installer keeps the existing configuration. The three values are still asked for; enter the same ones the forwarder already uses.</p>
+
+<p><strong>Notes:</strong> This template assumes the official forwarder package layout (the package extracts to a <code>fwd_dist</code> folder containing <code>AgentMonitorForwarder-Setup.exe</code>). Renaming the downloaded file is fine; do not repackage its contents. The applicability check below targets version 2.8.0; adjust it if you deploy a different version. After a successful install the forwarder shows ONLINE on the Forwarders page within about a minute.</p>
+        ]]></Description>
+        <Relevance>windows of operating system</Relevance>
+        <Relevance><![CDATA[(not exists file ((native program files folder) as string & "\AgentMonitorForwarder\AgentMonitorForwarder.exe")) OR (version of file ((native program files folder) as string & "\AgentMonitorForwarder\AgentMonitorForwarder.exe") < "2.8.0" as version)]]></Relevance>
+        <Category>Software Distribution</Category>
+        <DownloadSize>0</DownloadSize>
+        <Source>Agent Monitor</Source>
+        <SourceID></SourceID>
+        <SourceReleaseDate>2026-11-19</SourceReleaseDate>
+        <SourceSeverity>Low</SourceSeverity>
+        <CVENames></CVENames>
+        <SANSID></SANSID>
+        <Domain>BESC</Domain>
+        <DefaultAction ID="Action1">
+            <Description>
+                <PreLink>Install or upgrade the Agent Monitor Forwarder. </PreLink>
+                <Link>Click here</Link>
+                <PostLink> to deploy. You are asked for the dashboard URL, the forwarder key, and the forwarder name.</PostLink>
+            </Description>
+            <ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[// =========================================================================
+// Agent Monitor for BES Clients: Forwarder install / upgrade (TEMPLATE)
+// =========================================================================
+// EDIT BEFORE USE. Replace every CHANGE_ME_ placeholder below:
+//
+//   CHANGE_ME_DOWNLOAD_URL      the base URL the forwarder host downloads
+//                               from, including scheme, host, port, and path.
+//                               Example: http://your-root-server:52311/your-path
+//   CHANGE_ME_FORWARDER_PKG     the forwarder package file name (a .zip)
+//   CHANGE_ME_FORWARDER_SHA256  the SHA-256 of the forwarder package (from the
+//                               release SHA256SUMS; lowercase hex)
+//
+// The SHA-256 is verified after download and the action HALTS on any mismatch,
+// so a tampered or wrong package is never extracted or run.
+//
+// Three values are asked for when the action is taken. They come from the
+// dashboard, under Administration > System Settings > Forwarders.
+
+action parameter query "DASHBOARD_URL" with description "Dashboard URL for agent and forwarder traffic, for example https://dashboard.example.com:31313 (no trailing slash)."
+action parameter query "FORWARDER_KEY" with description "Forwarder key from the Forwarders page (begins with bch-)."
+action parameter query "FORWARDER_NAME" with description "The name this forwarder was registered under on the Forwarders page."
+
+delete fwd.zip
+
+download now as fwd.zip CHANGE_ME_DOWNLOAD_URL/CHANGE_ME_FORWARDER_PKG
+// Verify the package against its published SHA-256 before extracting or
+// running it. On any mismatch the action stops here (nothing is run).
+continue if {(sha256 of file "fwd.zip" of folder "__Download" of client folder of current site) as string = "CHANGE_ME_FORWARDER_SHA256"}
+
+// Extract the package.
+waithidden powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Remove-Item -Recurse -Force 'C:\temp\amforwarder' -ErrorAction SilentlyContinue; Expand-Archive -Path '{pathname of file "fwd.zip" of folder "__Download" of client folder of current site}' -DestinationPath 'C:\temp\amforwarder' -Force"
+waithidden powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem -Path 'C:\temp\amforwarder' -Recurse -File | Unblock-File"
+
+// Run the installer silently. The three values are passed as installer
+// arguments; the installer refuses a fresh install without a usable dashboard
+// URL and key, and never prompts. A non-zero exit fails the action.
+waithidden "C:\temp\amforwarder\fwd_dist\AgentMonitorForwarder-Setup.exe" --silent --api-url={parameter "DASHBOARD_URL"} --forwarder-key={parameter "FORWARDER_KEY"} --name={parameter "FORWARDER_NAME"}
+continue if {exit code of action = 0}
+]]></ActionScript>
+            <SuccessCriteria Option="RunToCompletion"></SuccessCriteria>
+        </DefaultAction>
+    </Fixlet>
+</BES>
